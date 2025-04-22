@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diviner - AI Logistics Assistant</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Simple icon library (optional, for demo) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <h1><img src="placeholder-logo.png" alt="Diviner Logo" class="logo"> Diviner</h1>
+            <div class="role-switcher">
+                <label for="roleSelect">View As:</label>
+                <select id="roleSelect">
+                    <option value="ayesha" selected>Dr. Ayesha (Public Health)</option>
+                    <option value="imran">Imran (Logistics)</option>
+                    <option value="leila">Leila (Pharmacist)</option>
+                    <option value="faisal">Faisal (Supplier)</option>
+                    <option value="reem">Reem (AI Analyst)</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <!-- Dr. Ayesha's View (Public Health Director) -->
+        <section id="view-ayesha" class="dashboard-view active-view">
+            <h2>Dr. Ayesha's Dashboard (Public Health Director)</h2>
+            <div class="grid-container">
+                <!-- Heatmap & Outbreak Spike -->
+                <div class="card heatmap-card">
+                    <h3>Live Outbreak Risk Map & Trends</h3>
+                    <div class="heatmap-placeholder">
+                        <p><strong><i class="fas fa-sync fa-spin"></i> Loading Alert Status...</strong></p>
+                        <div class="map-area">[Loading Heatmap Data...]</div>
+                        <span class="badge challenge-response">Challenge Response Active</span>
+                        <button class="button info-button">Why?</button>
+                    </div>
+                    <div class="trend-chart-placeholder">
+                        <p>Syndromic Surveillance: Flu Symptoms</p>
+                        <div class="chart-area">[Loading Trend Data...]</div>
+                        <small>Data Sources: Loading...</small>
+                    </div>
+                </div>
+
+                <!-- Demand Forecast & Strain -->
+                <div class="card forecast-card">
+                    <h3>Demand Forecast & Operational Strain</h3>
+                     <div class="forecast-chart-placeholder">
+                        <p>ICU Bed Demand Forecast (Next 7 Days)</p>
+                        <div class="chart-area">[Line Chart showing projected ICU demand exceeding capacity within 3 days. Confidence: 85%]</div>
+                        <span class="tooltip">Forecast Drivers: High GP report volume, Increased 'fever' mentions online.</span>
+                    </div>
+                    <div class="strain-warnings">
+                        <h4>Operational Strain Warnings (Current)</h4>
+                        <div class="strain-item critical-5"><i class="fas fa-users"></i> Staffing: <strong>Critical (5/5)</strong> - High risk of shortage due to sickness & demand.</div>
+                        <div class="strain-item critical-3"><i class="fas fa-lungs-virus"></i> Ventilators: <strong>Moderate (3/5)</strong> - Usage increasing, monitor closely.</div>
+                        <div class="strain-item critical-2"><i class="fas fa-shield-virus"></i> PPE: <strong>Low (2/5)</strong> - Stock levels currently stable.</div>
+                    </div>
+                </div>
+
+                <!-- AI Recommendations & Actions -->
+                <div class="card recommendations-card">
+                    <h3>AI Recommendations</h3>
+                    <div class="recommendation-item">
+                        <p><strong><i class="fas fa-clipboard-list"></i> Action:</strong> Generate & Approve Health Action Plan for Flu Surge.</p>
+                        <p><em>Impact Estimate:</em> Reduce potential hospital overload by 15-20%.</p>
+                        <p><em>Confidence:</em> <span style="color: green; font-weight: bold;">High (90%)</span></p>
+                        <div class="action-buttons">
+                            <button id="approvePlanBtn" class="button button-accept"><i class="fas fa-check"></i> Approve Plan</button>
+                            <button class="button button-modify"><i class="fas fa-edit"></i> Modify</button>
+                            <button class="button button-decline"><i class="fas fa-times"></i> Decline</button>
+                        </div>
+                    </div>
+                     <div class="recommendation-item">
+                        <p><strong><i class="fas fa-truck"></i> Action:</strong> Alert regional logistics (Imran) for potential stock redistribution.</p>
+                         <p><em>Impact Estimate:</em> Ensure >95% pharmacy stock availability in high-risk zones (Deira).</p>
+                         <p><em>Confidence:</em> <span style="color: orange; font-weight: bold;">Medium (75%)</span></p>
+                        <div class="action-buttons">
+                            <button id="sendLogisticsAlertBtn" class="button button-accept"><i class="fas fa-paper-plane"></i> Send Alert</button>
+                            <button class="button button-decline"><i class="fas fa-ban"></i> Dismiss</button>
+                        </div>
+                    </div>
+                    <div class="learning-indicator">
+                        <p><i class="fas fa-brain"></i> Model updated 2 hours ago based on latest GP data & social media trends.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Imran's View (Logistics Manager) -->
+        <section id="view-imran" class="dashboard-view">
+            <h2>Imran's Dashboard (Regional Logistics Manager)</h2>
+             <div class="grid-container">
+                 <div class="card stock-card">
+                     <h3>Inventory & Forecast (Flu Meds - Deira Hub)</h3>
+                     <p><strong id="imranAlertMessage"><i class="fas fa-info-circle"></i> ALERT:</strong> Awaiting instructions from Public Health Authority.</p>
+                     <div class="stock-comparison">
+                         <div>
+                             <h4>Current Stock</h4>
+                             <p>Flu Vaccine: 1,500 units</p>
+                             <p>Antivirals (Oseltamivir): 800 units</p>
+                         </div>
+                         <div>
+                             <h4>Forecasted Need (Next 48h)</h4>
+                             <p>Flu Vaccine: <strong style="color: red;">5,000 units</strong></p>
+                             <p>Antivirals (Oseltamivir): <strong style="color: red;">3,000 units</strong></p>
+                         </div>
+                     </div>
+                     <p id="imranShortfallMessage" style="margin-top: 1rem; color: grey; font-weight: normal;">Projected Shortfall: TBD</p>
+                 </div>
+
+                 <div class="card route-card">
+                     <h3>AI Recommended Redistribution</h3>
+                     <p id="imranActionMessage"><strong><i class="fas fa-random"></i> Action:</strong> Awaiting approved plan for redistribution details.</p>
+                     <div id="imranRouteDetails" class="route-placeholder" style="display: none;">
+                         <p>Optimized Route:</p>
+                         <div class="map-area">[Map showing optimized truck route from Al Ain Depot to Deira Hub, avoiding traffic hotspots]</div>
+                         <p><strong>ETA:</strong> 4 hours</p>
+                         <p><strong>Proposed Stock:</strong> 4,000 Flu Vaccines, 2,500 Antivirals</p>
+                     </div>
+                     <div class="action-buttons">
+                         <button id="confirmDispatchBtn" class="button button-accept" disabled><i class="fas fa-check-circle"></i> Confirm Route & Dispatch</button>
+                         <button id="modifyDispatchBtn" class="button button-modify" disabled><i class="fas fa-pencil-alt"></i> Adjust Quantities/Route</button>
+                     </div>
+                 </div>
+
+                 <div class="card reallocation-card">
+                     <h3>Inventory Reallocation Status</h3>
+                     <div class="status-item">
+                         <p><strong>Shipment ID:</strong> #FLU-DXB-001</p>
+                         <p><strong>From:</strong> Al Ain Depot</p>
+                         <p><strong>To:</strong> Deira Hub</p>
+                         <p><strong>Contents:</strong> Flu Vaccines (4k), Antivirals (2.5k)</p>
+                         <p><strong>Status:</strong> <span id="shipmentStatus" class="status-pending"><i class="fas fa-hourglass-start"></i> Awaiting Plan Approval</span></p>
+                     </div>
+                     <!-- Add more status items as needed -->
+                 </div>
+            </div>
+        </section>
+
+        <!-- Leila's View (Community Pharmacist) -->
+        <section id="view-leila" class="dashboard-view">
+            <h2>Leila's Dashboard (Community Pharmacist - Deira)</h2>
+            <div class="grid-container single-column">
+                <div class="card notification-card">
+                    <h3>Notifications & Alerts</h3>
+                    <div id="leilaUrgentAlertContainer" class="alert-item info" style="display: none;"> <!-- Initially hidden -->
+                        <p id="leilaUrgentAlertText">...</p>
+                        <small id="leilaUrgentAlertTime">Received: ...</small>
+                    </div>
+                     <div class="alert-item info">
+                        <p><strong><i class="fas fa-info-circle"></i> INFO:</strong> AI suggests promoting preventive flu measures (masks, sanitizers) due to high community transmission indicators.</p>
+                        <small>Received: 1 hour ago</small>
+                    </div>
+                     <div id="leilaConfirmationMsg" style="color: green; margin-top: 10px; font-weight: bold;"></div>
+                </div>
+
+                <div class="card local-forecast-card">
+                    <h3>Local Demand Forecast (Your Pharmacy - Next 24h)</h3>
+                    <div class="forecast-chart-placeholder">
+                        <p>Demand for Flu-Related Meds & Items</p>
+                        <div class="chart-area">[Simple Bar Chart: Antivirals +300%, Vaccines +250%, Masks +150%, Sanitizers +100%]</div>
+                    </div>
+                </div>
+
+                <div class="card suggestions-card">
+                    <h3>AI Recommendations for Pharmacy</h3>
+                    <p><strong><i class="fas fa-box-open"></i> Suggestion:</strong> Prepare storage space for incoming delivery (approx. 6 large crates).</p>
+                    <p><strong><i class="fas fa-store"></i> Suggestion:</strong> Set up promotional display for Vitamin C and sanitizers near entrance to capture increased footfall.</p>
+                    <div class="action-buttons">
+                        <button id="leilaActionedBtn" class="button button-accept" disabled><i class="fas fa-tasks"></i> Mark All as Actioned</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Faisal's View (Pharmaceutical Supplier) -->
+        <section id="view-faisal" class="dashboard-view">
+            <h2>Faisal's Dashboard (Pharmaceutical Supplier)</h2>
+             <div class="grid-container">
+                 <div class="card national-demand-card">
+                     <h3>National Demand Forecast & Signals</h3>
+                     <p id="faisalDemandSignal"><strong><i class="fas fa-chart-line"></i> Signal:</strong> Monitoring national health network signals...</p>
+                      <div class="forecast-chart-placeholder">
+                        <p>National Demand Trend: Flu Vaccines & Antivirals</p>
+                        <div class="chart-area">[National Trend Chart - Currently Stable]</div>
+                        <small>Key Drivers: Awaiting significant outbreak triggers.</small>
+                    </div>
+                 </div>
+
+                 <div class="card production-card">
+                     <h3>Production Priority Queue</h3>
+                     <p id="faisalProdRecommendation"><strong><i class="fas fa-cogs"></i> AI Recommendation:</strong> Maintain standard production schedule.</p>
+                     <ol id="faisalProdQueue">
+                         <li>Standard Antibiotic #AB123</li>
+                         <li>Pain Relief Med #PR789</li>
+                         <li>Routine Stock Replenishment</li>
+                         <!-- Flu meds will be added dynamically -->
+                     </ol>
+                     <div class="auto-adjust">
+                         <label for="autoAdjustToggle"><i class="fas fa-robot"></i> Auto-adjust production line based on AI forecast:</label>
+                         <input type="checkbox" id="autoAdjustToggle" name="autoAdjustToggle" checked>
+                         <span style="color: green; font-weight: bold;">Enabled</span>
+                     </div>
+                 </div>
+
+                 <div class="card resource-card">
+                    <h3>Resource Allocation</h3>
+                    <p><strong><i class="fas fa-industry"></i> Status:</strong> Raw material orders for prioritized batches confirmed.</p>
+                    <p><strong><i class="fas fa-shipping-fast"></i> Logistics:</strong> Outbound shipping capacity reserved for anticipated distribution needs.</p>
+                 </div>
+            </div>
+        </section>
+
+        <!-- Reem's View (AI & Data Analyst) -->
+        <section id="view-reem" class="dashboard-view">
+            <h2>Reem's Dashboard (AI & Data Analyst)</h2>
+            <div class="grid-container">
+                <div class="card simulation-card">
+                    <h3>Post-Response Analysis & Simulation</h3>
+                    <p><strong>Scenario:</strong> Deira Flu Surge (Nov 2023)</p>
+                    <div class="simulation-comparison">
+                        <div>
+                            <h4>Without Diviner (Simulated)</h4>
+                            <p><i class="fas fa-hourglass-half"></i> Response Time: ~72 hours</p>
+                            <p><i class="fas fa-boxes"></i> Stock Shortages: ~35%</p>
+                            <p><i class="fas fa-trash-alt"></i> Wastage (Expired/Misallocated): ~15%</p>
+                        </div>
+                        <div>
+                            <h4>With Diviner (Actual)</h4>
+                            <p><i class="fas fa-tachometer-alt"></i> Response Time: <strong>8 hours (3x Faster)</strong></p>
+                            <p><i class="fas fa-check-double"></i> Stock Shortages: <strong>2% (98% Prevented)</strong></p>
+                            <p><i class="fas fa-recycle"></i> Wastage Reduced: <strong>6% (60% Reduction)</strong></p>
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="button button-modify"><i class="fas fa-vial"></i> Run New Simulation</button>
+                    </div>
+                </div>
+
+                <div class="card model-tuning-card">
+                    <h3>Model Tuning & Performance</h3>
+                    <p><strong><i class="fas fa-lightbulb"></i> Insight:</strong> Social media sentiment analysis (specifically 'fever' + 'Deira' mentions) was highly predictive (Weight: 0.75) for this event's early detection.</p>
+                    <div class="tuning-controls">
+                        <p>Adjust model parameters for next learning cycle:</p>
+                        <label>GP Data Weight: <input type="range" min="0" max="1" step="0.05" value="0.8"> (0.80)</label><br>
+                        <label>Social Media Weight: <input type="range" min="0" max="1" step="0.05" value="0.75"> (0.75)</label><br>
+                        <label>Hospital Admission Weight: <input type="range" min="0" max="1" step="0.05" value="0.6"> (0.60)</label><br>
+                        <div class="action-buttons">
+                            <button id="retrainModelBtn" class="button button-accept"><i class="fas fa-save"></i> Apply Changes & Retrain</button>
+                        </div>
+                         <div id="retrainConfirmationMsg" style="color: green; margin-top: 10px; font-weight: bold;"></div>
+                    </div>
+                </div>
+
+                <div class="card learning-timeline-card">
+                    <h3>Learning Timeline & Accuracy</h3>
+                     <div class="timeline-placeholder">
+                        <p>Model Predictive Accuracy Over Time</p>
+                        <div class="chart-area">[Line chart showing accuracy improving from 70% to 92% over last 6 months]</div>
+                        <p id="lastRetrainingTime"><i class="fas fa-history"></i> Last Retraining: <strong>1 day ago</strong>.</p>
+                        <p><i class="fas fa-check-circle"></i> Current Accuracy (Short-term Forecast): <strong>92.5%</strong></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Future Features Placeholder -->
+        <section class="future-features">
+            <h4><i class="fas fa-forward"></i> Coming Soon...</h4>
+            <p>Integration with Wearable Data | Pharmacy Chatbot Alerts | Advanced Supply Chain Optimization</p>
+        </section>
+
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 Diviner Health Solutions. Transforming Healthcare Logistics.</p>
+            <p>Built with Agentic AI | <i class="fas fa-eye"></i> Perceive → <i class="fas fa-brain"></i> Reason → <i class="fas fa-play"></i> Act → <i class="fas fa-sync-alt"></i> Learn</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
