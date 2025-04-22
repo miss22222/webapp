@@ -38,13 +38,14 @@
                         <p><strong><i class="fas fa-sync fa-spin"></i> Loading Alert Status...</strong></p>
                         <div class="map-area">[Loading Heatmap Data...]</div>
                         <span class="badge challenge-response">Challenge Response Active</span>
-                        <button class="button info-button">Why?</button>
+                        <button id="heatmapWhyBtn" class="button info-button">Why?</button>
                     </div>
                     <div class="trend-chart-placeholder">
                         <p>Syndromic Surveillance: Flu Symptoms</p>
                         <div class="chart-area">[Loading Trend Data...]</div>
                         <small>Data Sources: Loading...</small>
                     </div>
+                    <div class="feedback-area" id="heatmapWhyFeedback" style="margin-top: 5px; font-style: italic; color: #555; display: none;"></div>
                 </div>
 
                 <!-- Demand Forecast & Strain -->
@@ -66,25 +67,55 @@
                 <!-- AI Recommendations & Actions -->
                 <div class="card recommendations-card">
                     <h3>AI Recommendations</h3>
-                    <div class="recommendation-item">
+                    <!-- Recommendation 1: Main Action Plan -->
+                    <div class="recommendation-item" id="recItemPlan">
                         <p><strong><i class="fas fa-clipboard-list"></i> Action:</strong> Generate & Approve Health Action Plan for Flu Surge.</p>
                         <p><em>Impact Estimate:</em> Reduce potential hospital overload by 15-20%.</p>
                         <p><em>Confidence:</em> <span style="color: green; font-weight: bold;">High (90%)</span></p>
                         <div class="action-buttons">
                             <button id="approvePlanBtn" class="button button-accept"><i class="fas fa-check"></i> Approve Plan</button>
-                            <button class="button button-modify"><i class="fas fa-edit"></i> Modify</button>
-                            <button class="button button-decline"><i class="fas fa-times"></i> Decline</button>
+                            <button id="modifyPlanBtn" class="button button-modify"><i class="fas fa-edit"></i> Modify</button>
+                            <button id="declinePlanBtn" class="button button-decline"><i class="fas fa-times"></i> Decline</button>
                         </div>
+                        <div class="feedback-area" id="planFeedback" style="margin-top: 5px; font-style: italic; color: #555;"></div>
                     </div>
-                     <div class="recommendation-item">
+                    <!-- Recommendation 2: Logistics Alert (Now separate) -->
+                     <div class="recommendation-item" id="recItemLogistics">
                         <p><strong><i class="fas fa-truck"></i> Action:</strong> Alert regional logistics (Imran) for potential stock redistribution.</p>
                          <p><em>Impact Estimate:</em> Ensure >95% pharmacy stock availability in high-risk zones (Deira).</p>
                          <p><em>Confidence:</em> <span style="color: orange; font-weight: bold;">Medium (75%)</span></p>
                         <div class="action-buttons">
-                            <button id="sendLogisticsAlertBtn" class="button button-accept"><i class="fas fa-paper-plane"></i> Send Alert</button>
-                            <button class="button button-decline"><i class="fas fa-ban"></i> Dismiss</button>
+                            <!-- Note: This button is now primarily informational if approval triggers Imran -->
+                            <button id="sendLogisticsAlertBtn" class="button button-accept"><i class="fas fa-paper-plane"></i> Send Alert Now</button>
+                            <button id="dismissLogisticsBtn" class="button button-decline"><i class="fas fa-ban"></i> Dismiss</button>
                         </div>
+                         <div class="feedback-area" id="logisticsFeedback" style="margin-top: 5px; font-style: italic; color: #555;"></div>
                     </div>
+                    <!-- Recommendation 3: Public Awareness Campaign -->
+                    <div class="recommendation-item" id="recItemAwareness">
+                        <p><strong><i class="fas fa-bullhorn"></i> Action:</strong> Initiate targeted public awareness campaign (SMS/Social Media) in Deira regarding hygiene and symptom checking.</p>
+                        <p><em>Impact Estimate:</em> Reduce transmission rate by 5-10%.</p>
+                        <p><em>Confidence:</em> <span style="color: orange; font-weight: bold;">Medium (70%)</span></p>
+                        <div class="action-buttons">
+                            <button id="initiateCampaignBtn" class="button button-accept"><i class="fas fa-play-circle"></i> Initiate Campaign</button>
+                            <button id="scheduleCampaignBtn" class="button button-modify"><i class="fas fa-calendar-alt"></i> Schedule Later</button>
+                            <button id="declineCampaignBtn" class="button button-decline"><i class="fas fa-times"></i> Decline</button>
+                        </div>
+                        <div class="feedback-area" id="campaignFeedback" style="margin-top: 5px; font-style: italic; color: #555;"></div>
+                    </div>
+                    <!-- Recommendation 4: School Advisory -->
+                     <div class="recommendation-item" id="recItemSchools">
+                        <p><strong><i class="fas fa-school"></i> Action:</strong> Issue advisory to schools in high-risk zones regarding enhanced screening protocols.</p>
+                        <p><em>Impact Estimate:</em> Early detection increase by 10-15% in school-age children.</p>
+                        <p><em>Confidence:</em> <span style="color: green; font-weight: bold;">High (85%)</span></p>
+                        <div class="action-buttons">
+                            <button id="issueAdvisoryBtn" class="button button-accept"><i class="fas fa-paper-plane"></i> Issue Advisory</button>
+                            <button id="reviewAdvisoryBtn" class="button button-modify"><i class="fas fa-edit"></i> Review/Modify</button>
+                            <button id="declineAdvisoryBtn" class="button button-decline"><i class="fas fa-times"></i> Decline</button>
+                        </div>
+                         <div class="feedback-area" id="advisoryFeedback" style="margin-top: 5px; font-style: italic; color: #555;"></div>
+                    </div>
+
                     <div class="learning-indicator">
                         <p><i class="fas fa-brain"></i> Model updated 2 hours ago based on latest GP data & social media trends.</p>
                     </div>
@@ -112,6 +143,11 @@
                          </div>
                      </div>
                      <p id="imranShortfallMessage" style="margin-top: 1rem; color: grey; font-weight: normal;">Projected Shortfall: TBD</p>
+                     <div class="card-actions">
+                         <button id="imranViewStockDetailsBtn" class="button"><i class="fas fa-list-alt"></i> View Details</button>
+                         <button id="imranAdjustThresholdsBtn" class="button"><i class="fas fa-sliders-h"></i> Adjust Thresholds</button>
+                     </div>
+                     <div class="feedback-area" id="imranStockFeedback" style="margin-top: 5px; font-style: italic; color: #555; display: none;"></div>
                  </div>
 
                  <div class="card route-card">
@@ -139,6 +175,15 @@
                          <p><strong>Status:</strong> <span id="shipmentStatus" class="status-pending"><i class="fas fa-hourglass-start"></i> Awaiting Plan Approval</span></p>
                      </div>
                      <!-- Add more status items as needed -->
+                 </div>
+
+                 <!-- New Activity Log Card -->
+                 <div class="card activity-log-card">
+                     <h3>Public Health Activity Log</h3>
+                     <ul id="imranActivityLog">
+                         <li><i class="fas fa-history"></i> Monitoring initiated...</li>
+                         <!-- Log entries will be added here by JS -->
+                     </ul>
                  </div>
             </div>
         </section>
@@ -194,7 +239,7 @@
                  </div>
 
                  <div class="card production-card">
-                     <h3>Production Priority Queue</h3>
+                     <h3>Current Production Lines</h3>
                      <p id="faisalProdRecommendation"><strong><i class="fas fa-cogs"></i> AI Recommendation:</strong> Maintain standard production schedule.</p>
                      <ol id="faisalProdQueue">
                          <li>Standard Antibiotic #AB123</li>
@@ -202,19 +247,29 @@
                          <li>Routine Stock Replenishment</li>
                          <!-- Flu meds will be added dynamically -->
                      </ol>
-                     <div class="auto-adjust">
-                         <label for="autoAdjustToggle"><i class="fas fa-robot"></i> Auto-adjust production line based on AI forecast:</label>
-                         <input type="checkbox" id="autoAdjustToggle" name="autoAdjustToggle" checked>
-                         <span style="color: green; font-weight: bold;">Enabled</span>
+                     <div class="card-actions">
+                         <button id="faisalAutoAdjustToggle" class="button button-toggle"><i class="fas fa-robot"></i> Auto-adjust: OFF</button>
+                         <button id="faisalViewProdDetailsBtn" class="button"><i class="fas fa-list-alt"></i> View Details</button>
+                         <button id="faisalManualOverrideBtn" class="button button-warning"><i class="fas fa-user-cog"></i> Manual Override</button>
                      </div>
+                     <div class="feedback-area" id="faisalProdFeedback" style="margin-top: 5px; font-style: italic; color: #555; display: none;"></div>
                  </div>
 
-                 <div class="card resource-card">
-                    <h3>Resource Allocation</h3>
-                    <p><strong><i class="fas fa-industry"></i> Status:</strong> Raw material orders for prioritized batches confirmed.</p>
-                    <p><strong><i class="fas fa-shipping-fast"></i> Logistics:</strong> Outbound shipping capacity reserved for anticipated distribution needs.</p>
+                 <div class="card material-stock-card">
+                     <h3>Raw Material Stock</h3>
+                     <p><strong><i class="fas fa-industry"></i> Status:</strong> Raw material orders for prioritized batches confirmed.</p>
+                     <p><strong><i class="fas fa-shipping-fast"></i> Logistics:</strong> Outbound shipping capacity reserved for anticipated distribution needs.</p>
+                     <div class="card-actions">
+                         <button id="faisalViewSuppliersBtn" class="button"><i class="fas fa-users"></i> View Suppliers</button>
+                         <button id="faisalPlaceMaterialOrderBtn" class="button button-accept"><i class="fas fa-shopping-cart"></i> Place Order</button>
+                     </div>
+                      <div class="feedback-area" id="faisalMaterialFeedback" style="margin-top: 5px; font-style: italic; color: #555; display: none;"></div>
                  </div>
-            </div>
+
+                 <div class="card priority-queue-card">
+                     <!-- ... Production Priority Queue (no buttons here) ... -->
+                 </div>
+             </div>
         </section>
 
         <!-- Reem's View (AI & Data Analyst) -->
@@ -222,30 +277,28 @@
             <h2>Reem's Dashboard (AI & Data Analyst)</h2>
             <div class="grid-container">
                 <div class="card simulation-card">
-                    <h3>Post-Response Analysis & Simulation</h3>
-                    <p><strong>Scenario:</strong> Deira Flu Surge (Nov 2023)</p>
-                    <div class="simulation-comparison">
-                        <div>
-                            <h4>Without Diviner (Simulated)</h4>
-                            <p><i class="fas fa-hourglass-half"></i> Response Time: ~72 hours</p>
-                            <p><i class="fas fa-boxes"></i> Stock Shortages: ~35%</p>
-                            <p><i class="fas fa-trash-alt"></i> Wastage (Expired/Misallocated): ~15%</p>
-                        </div>
-                        <div>
-                            <h4>With Diviner (Actual)</h4>
-                            <p><i class="fas fa-tachometer-alt"></i> Response Time: <strong>8 hours (3x Faster)</strong></p>
-                            <p><i class="fas fa-check-double"></i> Stock Shortages: <strong>2% (98% Prevented)</strong></p>
-                            <p><i class="fas fa-recycle"></i> Wastage Reduced: <strong>6% (60% Reduction)</strong></p>
-                        </div>
+                    <h3>Model Simulation & Tuning</h3>
+                    <p>Simulate impact of different response strategies or data inputs.</p>
+                    <div class="card-actions">
+                        <button id="reemRunSimulationBtn" class="button button-accept"><i class="fas fa-play"></i> Run Simulation</button>
+                        <button id="reemCompareModelsBtn" class="button"><i class="fas fa-exchange-alt"></i> Compare Models</button>
                     </div>
-                    <div class="action-buttons">
-                        <button class="button button-modify"><i class="fas fa-vial"></i> Run New Simulation</button>
-                    </div>
+                     <div class="feedback-area" id="reemSimFeedback" style="margin-top: 5px; font-style: italic; color: #555; display: none;"></div>
                 </div>
 
-                <div class="card model-tuning-card">
-                    <h3>Model Tuning & Performance</h3>
-                    <p><strong><i class="fas fa-lightbulb"></i> Insight:</strong> Social media sentiment analysis (specifically 'fever' + 'Deira' mentions) was highly predictive (Weight: 0.75) for this event's early detection.</p>
+                <div class="card deployment-card">
+                    <h3>Model Deployment</h3>
+                    <p>Current Model: <strong>FluNet-v3.1 (Accuracy: 92.5%)</strong></p>
+                    <div class="card-actions">
+                        <button id="reemDeployUpdateBtn" class="button button-accept"><i class="fas fa-cloud-upload-alt"></i> Deploy Update</button>
+                        <button id="reemRollbackBtn" class="button button-decline"><i class="fas fa-undo"></i> Rollback</button>
+                    </div>
+                     <div class="feedback-area" id="reemDeployFeedback" style="margin-top: 5px; font-style: italic; color: #555; display: none;"></div>
+                </div>
+
+                <div class="card retraining-card">
+                    <h3>Model Retraining</h3>
+                    <p><strong><i class="fas fa-vial"></i> Insight:</strong> Social media sentiment analysis (specifically 'fever' + 'Deira' mentions) was highly predictive (Weight: 0.75) for this event's early detection.</p>
                     <div class="tuning-controls">
                         <p>Adjust model parameters for next learning cycle:</p>
                         <label>GP Data Weight: <input type="range" min="0" max="1" step="0.05" value="0.8"> (0.80)</label><br>
