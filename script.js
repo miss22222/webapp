@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
+
     // --- Simulated Data from Google Sheet ---
     // Source: https://docs.google.com/spreadsheets/d/1GtZoPJA-zEhlmBXqSmtMqs1Xf2mrt-22nNADKjFnpKo/edit?gid=1188786314#gid=1188786314
     const patientData = [
@@ -112,8 +113,27 @@ document.addEventListener('DOMContentLoaded', function() {
     const ayeshaHeatmapArea = document.querySelector('#view-ayesha .heatmap-placeholder .map-area');
     const ayeshaTrendChartArea = document.querySelector('#view-ayesha .trend-chart-placeholder .chart-area');
     const ayeshaTrendDataSources = document.querySelector('#view-ayesha .trend-chart-placeholder small');
+    const heatmapWhyBtn = document.getElementById('heatmapWhyBtn');
+    const heatmapWhyFeedback = document.getElementById('heatmapWhyFeedback');
+    // Plan Recommendation
     const approvePlanBtn = document.getElementById('approvePlanBtn');
+    const modifyPlanBtn = document.getElementById('modifyPlanBtn');
+    const declinePlanBtn = document.getElementById('declinePlanBtn');
+    const planFeedback = document.getElementById('planFeedback');
+    // Logistics Recommendation
     const sendLogisticsAlertBtn = document.getElementById('sendLogisticsAlertBtn');
+    const dismissLogisticsBtn = document.getElementById('dismissLogisticsBtn');
+    const logisticsFeedback = document.getElementById('logisticsFeedback');
+    // Campaign Recommendation
+    const initiateCampaignBtn = document.getElementById('initiateCampaignBtn');
+    const scheduleCampaignBtn = document.getElementById('scheduleCampaignBtn');
+    const declineCampaignBtn = document.getElementById('declineCampaignBtn');
+    const campaignFeedback = document.getElementById('campaignFeedback');
+    // Advisory Recommendation
+    const issueAdvisoryBtn = document.getElementById('issueAdvisoryBtn');
+    const reviewAdvisoryBtn = document.getElementById('reviewAdvisoryBtn');
+    const declineAdvisoryBtn = document.getElementById('declineAdvisoryBtn');
+    const advisoryFeedback = document.getElementById('advisoryFeedback');
 
     // Imran
     const imranAlertMessage = document.getElementById('imranAlertMessage');
@@ -123,35 +143,62 @@ document.addEventListener('DOMContentLoaded', function() {
     const confirmDispatchBtn = document.getElementById('confirmDispatchBtn');
     const modifyDispatchBtn = document.getElementById('modifyDispatchBtn');
     const shipmentStatus = document.getElementById('shipmentStatus');
+    const imranActivityLog = document.getElementById('imranActivityLog');
+    const imranViewStockDetailsBtn = document.getElementById('imranViewStockDetailsBtn');
+    const imranAdjustThresholdsBtn = document.getElementById('imranAdjustThresholdsBtn');
+    const imranStockFeedback = document.getElementById('imranStockFeedback');
 
     // Leila
     const leilaUrgentAlertContainer = document.getElementById('leilaUrgentAlertContainer');
     const leilaUrgentAlertText = document.getElementById('leilaUrgentAlertText');
     const leilaUrgentAlertTime = document.getElementById('leilaUrgentAlertTime');
+    const leilaForecastChartArea = document.querySelector('#view-leila .forecast-card .chart-area');
     const leilaActionedBtn = document.getElementById('leilaActionedBtn');
     const leilaConfirmationMsg = document.getElementById('leilaConfirmationMsg');
-    const leilaForecastChartArea = document.querySelector('#view-leila .local-forecast-card .chart-area');
-
+    const leilaRequestOrderBtn = document.getElementById('leilaRequestOrderBtn');
+    const leilaViewHistoryBtn = document.getElementById('leilaViewHistoryBtn');
+    const leilaStockFeedback = document.getElementById('leilaStockFeedback');
+    const leilaApplyPromoBtn = document.getElementById('leilaApplyPromoBtn');
+    const leilaDismissPromoBtn = document.getElementById('leilaDismissPromoBtn');
+    const leilaApplyPlacementBtn = document.getElementById('leilaApplyPlacementBtn');
+    const leilaDismissPlacementBtn = document.getElementById('leilaDismissPlacementBtn');
+    const leilaRecFeedback = document.getElementById('leilaRecFeedback');
 
     // Faisal
     const faisalDemandSignal = document.getElementById('faisalDemandSignal');
     const faisalProdRecommendation = document.getElementById('faisalProdRecommendation');
     const faisalProdQueue = document.getElementById('faisalProdQueue');
     const faisalDemandChartArea = document.querySelector('#view-faisal .national-demand-card .chart-area');
-
+    const faisalAutoAdjustToggle = document.getElementById('faisalAutoAdjustToggle');
+    const faisalViewProdDetailsBtn = document.getElementById('faisalViewProdDetailsBtn');
+    const faisalManualOverrideBtn = document.getElementById('faisalManualOverrideBtn');
+    const faisalProdFeedback = document.getElementById('faisalProdFeedback');
+    const faisalViewSuppliersBtn = document.getElementById('faisalViewSuppliersBtn');
+    const faisalPlaceMaterialOrderBtn = document.getElementById('faisalPlaceMaterialOrderBtn');
+    const faisalMaterialFeedback = document.getElementById('faisalMaterialFeedback');
 
     // Reem
     const retrainModelBtn = document.getElementById('retrainModelBtn');
     const lastRetrainingTime = document.getElementById('lastRetrainingTime');
     const retrainConfirmationMsg = document.getElementById('retrainConfirmationMsg');
-
+    const reemRunSimulationBtn = document.getElementById('reemRunSimulationBtn');
+    const reemCompareModelsBtn = document.getElementById('reemCompareModelsBtn');
+    const reemSimFeedback = document.getElementById('reemSimFeedback');
+    const reemDeployUpdateBtn = document.getElementById('reemDeployUpdateBtn');
+    const reemRollbackBtn = document.getElementById('reemRollbackBtn');
+    const reemDeployFeedback = document.getElementById('reemDeployFeedback');
 
     // --- State Variables (Simple Simulation) ---
     let planApproved = false;
-    let logisticsAlertSent = false;
+    let planDecisionMade = false; // Track if Modify/Decline was clicked for the main plan
+    let logisticsAlertSent = false; // Tracks if the explicit "Send Alert Now" was clicked
+    let logisticsDecisionMade = false;
+    let campaignDecisionMade = false;
+    let advisoryDecisionMade = false;
     let shipmentDispatched = false;
     let pharmacyPrepared = false;
     let modelRetrained = false;
+    let faisalAutoAdjustEnabled = false; // State for toggle
 
     // --- Helper Functions ---
     function showConfirmation(element, message) {
@@ -165,6 +212,51 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function getCurrentTime() {
         return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function showFeedback(element, message, color = '#555') {
+        if (element) {
+            element.textContent = message;
+            element.style.color = color;
+            element.style.display = 'block';
+        } else {
+            console.warn("Feedback element not found for message:", message);
+        }
+    }
+
+    // New helper to add log entries
+    function addLogEntry(logElement, message, iconClass = 'fa-info-circle', color = '#333') {
+        if (logElement) {
+            const listItem = document.createElement('li');
+            listItem.style.color = color;
+            // Sanitize message before setting innerHTML if needed, but for this prototype, assuming safe content
+            listItem.innerHTML = `<i class="fas ${iconClass}"></i> [${getCurrentTime()}] ${message}`;
+            // Add to the top of the list
+            if (logElement.firstChild) {
+                logElement.insertBefore(listItem, logElement.firstChild);
+            } else {
+                logElement.appendChild(listItem);
+            }
+            // Optional: Limit log length
+            while (logElement.children.length > 10) { // Keep last 10 entries
+                 logElement.removeChild(logElement.lastChild);
+            }
+        } else {
+            console.warn("Log element not found for message:", message);
+        }
+    }
+
+    // Helper to disable buttons within the same parent action group
+    function disableActionButtons(buttonElement) {
+        const actionDiv = buttonElement.closest('.action-buttons, .card-actions');
+        if (actionDiv) {
+            actionDiv.querySelectorAll('button').forEach(btn => {
+                btn.disabled = true;
+            });
+        } else {
+            // Fallback for single buttons or different structures
+            buttonElement.disabled = true;
+        }
     }
 
     // --- Data Processing Functions ---
@@ -192,32 +284,28 @@ document.addEventListener('DOMContentLoaded', function() {
             .map(([clinic, count]) => {
                 let riskLevel = 'Low';
                 let color = 'green';
-                // Adjust thresholds based on data (max confirmed cases per clinic is ~10-15 in sample)
-                if (count >= 8) { riskLevel = 'High'; color = 'red'; }
-                else if (count >= 4) { riskLevel = 'Medium'; color = 'orange'; }
+                // Adjusted thresholds based on sample data size
+                if (count >= 10) { riskLevel = 'High'; color = 'red'; }
+                else if (count >= 5) { riskLevel = 'Medium'; color = 'orange'; }
                 return `<div style="margin-bottom: 5px;"><span style="color:${color}; font-weight:bold;">${riskLevel} Risk</span> - ${clinic}: ${count} confirmed cases</div>`;
             })
             .join('');
 
+        // Simple bar chart representation for trend
+        const maxDailyVisits = Math.max(...Object.values(symptomReportsByDate), 0);
         const trendSummary = uniqueDates.map(date => {
             const count = symptomReportsByDate[date] || 0;
-            // Simple bar representation
-            const barWidth = Math.min(100, count * 5); // Scale width based on count
-            return `<div style="margin-bottom: 3px; display: flex; align-items: center;">
-                        <span style="width: 80px; display: inline-block;">${date}:</span>
-                        <div style="width: ${barWidth}px; height: 15px; background-color: #0a2e5c; margin-right: 5px;"></div>
-                        <span>${count} visits</span>
+            const barHeight = maxDailyVisits > 0 ? (count / maxDailyVisits) * 50 : 0; // Max height 50px
+            return `<div style="display: inline-block; margin-right: 5px; text-align: center; vertical-align: bottom;">
+                        <div style="width: 20px; height: ${barHeight}px; background-color: #0a2e5c; margin: 0 auto;"></div>
+                        <small style="font-size: 0.7em;">${date.substring(5)}</small> <!-- Show MM-DD -->
                     </div>`;
         }).join('');
 
 
         const overallConfirmationRate = totalVisits > 0 ? ((totalConfirmedFlu / totalVisits) * 100).toFixed(1) : 0;
-        const confirmedDeiraUrgentCare = confirmedCasesByClinic['Deira Urgent Care'] || 0;
-        const totalDeiraUrgentCareVisits = patientData.filter(p => p.Clinic === 'Deira Urgent Care').length;
 
-
-        // --- Update Dashboard Elements (Initial State) ---
-
+        // --- Update Dashboard Elements (Initial State - Primarily Ayesha) ---
         // Dr. Ayesha
         if (ayeshaAlertText) {
             ayeshaAlertText.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ALERT: Flu Surge Detected in Deira (${overallConfirmationRate}% confirmation rate)`;
@@ -227,54 +315,15 @@ document.addEventListener('DOMContentLoaded', function() {
             ayeshaHeatmapArea.style.fontSize = '0.9em'; // Adjust font size if needed
         }
         if (ayeshaTrendChartArea) {
-            ayeshaTrendChartArea.innerHTML = `<strong>Daily Visits (Symptom Reports):</strong><br>${trendSummary || 'No visit data.'}`;
+            ayeshaTrendChartArea.innerHTML = `<strong>Daily Visits (Symptom Reports):</strong><br><div style="height: 60px; border: 1px solid #ccc; padding: 5px; overflow-x: auto; white-space: nowrap;">${trendSummary || 'No visit data.'}</div>`;
         }
          if (ayeshaTrendDataSources) {
              ayeshaTrendDataSources.textContent = `Data Sources: ${totalVisits} GP/Clinic Visits (Simulated), Social Media Mentions ('flu', 'fever')`;
          }
 
-        // Imran (Initial Context - before alert sent)
-        if (imranAlertMessage && !logisticsAlertSent) {
-            let initialImranAlertColor = overallConfirmationRate > 30 ? 'orange' : 'grey'; // Example threshold
-            imranAlertMessage.innerHTML = `<strong style="color:${initialImranAlertColor};"><i class="fas fa-info-circle"></i> ALERT:</strong> Monitoring situation. Overall Deira confirmation rate: ${overallConfirmationRate}%. Awaiting specific instructions.`;
-        }
-        if (imranShortfallMessage && !logisticsAlertSent) {
-             imranShortfallMessage.textContent = `Projected Shortfall: Analysis pending based on approved plan.`;
-             imranShortfallMessage.style.color = 'grey';
-        }
-
-
-        // Leila (Initial Context - before dispatch)
-        if (leilaForecastChartArea && !shipmentDispatched) {
-            let initialLeilaForecastHTML = `[Initial Data: ${confirmedDeiraUrgentCare} confirmed flu cases & ${totalDeiraUrgentCareVisits} total visits reported at nearby Deira Urgent Care. Monitor for specific alerts.]`;
-            if (confirmedDeiraUrgentCare > 5) { // Example threshold for higher initial concern
-                initialLeilaForecastHTML = `<strong style="color:orange;">[Elevated Activity Nearby: ${confirmedDeiraUrgentCare} confirmed flu cases & ${totalDeiraUrgentCareVisits} total visits reported at Deira Urgent Care. Prepare for potential demand increase.]</strong>`;
-            }
-            leilaForecastChartArea.innerHTML = initialLeilaForecastHTML;
-        }
-
-        // Faisal (Initial Context - before plan approved)
-        if (faisalDemandSignal && !planApproved) {
-            if (overallConfirmationRate > 35) { // Example threshold for higher initial concern
-                 faisalDemandSignal.innerHTML = '<strong><i class="fas fa-chart-line"></i> Signal:</strong> <span style="color:orange;">Elevated flu activity detected in Deira network (${overallConfirmationRate}% rate). Monitoring national impact...</span>';
-            } else {
-                 faisalDemandSignal.innerHTML = '<strong><i class="fas fa-chart-line"></i> Signal:</strong> Monitoring national health network signals...';
-            }
-        }
-         if (faisalDemandChartArea && !planApproved) {
-             faisalDemandChartArea.innerHTML = '[National Trend Chart - Currently Stable]';
-         }
-         if (faisalProdRecommendation && !planApproved) {
-             faisalProdRecommendation.innerHTML = '<strong><i class="fas fa-cogs"></i> AI Recommendation:</strong> Maintain standard production schedule.';
-         }
-         if (faisalProdQueue && !planApproved) {
-             faisalProdQueue.innerHTML = `
-                <li>Standard Antibiotic #AB123</li>
-                <li>Pain Relief Med #PR789</li>
-                <li>Routine Stock Replenishment</li>
-            `;
-         }
-
+        // Add updates for other personas if needed, using the processed data
+        // e.g., Update Leila's local forecast based on Deira Urgent Care counts
+        // Note: This part was removed in the revert, as the button clicks will now handle populating other views.
     }
 
 
@@ -299,35 +348,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- Interaction Logic ---
 
-    // Dr. Ayesha: Approve Plan
+    // --- Dr. Ayesha's Recommendations ---
+
+    // 1. Health Action Plan
     if (approvePlanBtn) {
         approvePlanBtn.addEventListener('click', function() {
-            if (!planApproved) {
-                planApproved = true;
+            if (!planApproved && !planDecisionMade) {
+                console.log("Ayesha: Approve Plan button clicked.");
+                planApproved = true; // MAIN STATE CHANGE FOR WORKFLOW
+                planDecisionMade = true;
                 this.disabled = true;
+                if (modifyPlanBtn) modifyPlanBtn.disabled = true;
+                if (declinePlanBtn) declinePlanBtn.disabled = true;
                 this.innerHTML = '<i class="fas fa-check-double"></i> Plan Approved';
-                sendLogisticsAlertBtn.disabled = false; // Enable the next step
-                console.log("Health Action Plan Approved.");
+                showFeedback(planFeedback, 'Action Plan approved and initiated.', 'green');
+                addLogEntry(imranActivityLog, 'Health Action Plan APPROVED by Dr. Ayesha.', 'fa-check-double', 'green');
+                console.log("Ayesha: Plan Approved. Updating Imran's dashboard and enabling his buttons.");
 
-                // Update Faisal's Dashboard (Now triggered by plan approval)
-                updateFaisalDashboard(); // This function now contains the specific updates for Faisal
-            }
-        });
-    } else { console.error("approvePlanBtn not found"); }
-
-    // Dr. Ayesha: Send Logistics Alert -> Updates Imran's View
-    if (sendLogisticsAlertBtn) {
-        sendLogisticsAlertBtn.disabled = true; // Initially disabled until plan approved
-        sendLogisticsAlertBtn.addEventListener('click', function() {
-            if (planApproved && !logisticsAlertSent) {
-                logisticsAlertSent = true;
-                this.disabled = true;
-                this.innerHTML = '<i class="fas fa-paper-plane"></i> Alert Sent';
-                console.log("Logistics Alert Sent to Imran.");
-
-                // --- Update Imran's Dashboard (Specific Action) ---
-                const overallConfirmationRate = patientData.length > 0 ? ((patientData.filter(p => p.ConfirmedFlu === "Yes").length / patientData.length) * 100).toFixed(1) : 0; // Recalculate for message
-
+                // --- Update Imran's Dashboard ---
+                const overallConfirmationRate = patientData.length > 0 ? ((patientData.filter(p => p.ConfirmedFlu === "Yes").length / patientData.length) * 100).toFixed(1) : 0;
                 if (imranAlertMessage) {
                     imranAlertMessage.innerHTML = `<strong style="color: red;"><i class="fas fa-exclamation-triangle"></i> URGENT ALERT:</strong> Health Action Plan approved. High flu activity confirmed (${overallConfirmationRate}% rate). Prepare for stock redistribution.`;
                 }
@@ -335,49 +374,215 @@ document.addEventListener('DOMContentLoaded', function() {
                     imranActionMessage.innerHTML = `<strong><i class="fas fa-random"></i> Action Required:</strong> Review AI recommended redistribution plan below.`;
                 }
                 if (imranRouteDetails) {
-                    imranRouteDetails.style.display = 'block'; // Show the route details
+                    imranRouteDetails.style.display = 'block';
                 }
-                if (confirmDispatchBtn) confirmDispatchBtn.disabled = false; // Enable Imran's actions
+                if (confirmDispatchBtn) {
+                    confirmDispatchBtn.disabled = false;
+                    console.log("Ayesha: Enabled Imran's Confirm Dispatch button.");
+                }
                 if (modifyDispatchBtn) modifyDispatchBtn.disabled = false;
 
                 if (imranShortfallMessage) {
                     imranShortfallMessage.innerHTML = `Projected Shortfall (Deira Hub, 48h): <strong style="color:red;">Vaccines: ~3,500 units, Antivirals: ~2,200 units</strong>`;
-                    imranShortfallMessage.style.color = 'red'; // Make text red
+                    imranShortfallMessage.style.color = 'red';
                 }
-                if (shipmentStatus) { // Update status if needed
+                if (shipmentStatus) {
                     shipmentStatus.innerHTML = '<i class="fas fa-tasks"></i> Plan Approved - Awaiting Dispatch Confirmation';
                     shipmentStatus.className = 'status-pending';
                     shipmentStatus.style.color = 'orange';
                 }
+            } else {
+                 console.log("Ayesha: Approve Plan button clicked, but plan already approved or decision made.");
+            }
+        });
+    } else { console.error("approvePlanBtn not found"); }
 
-                // Optional: Switch view to Imran
-                // setTimeout(() => {
-                //     roleSelect.value = 'imran';
-                //     switchView('imran');
-                // }, 500);
+    if (modifyPlanBtn) {
+        modifyPlanBtn.addEventListener('click', function() {
+            if (!planApproved && !planDecisionMade) {
+                planDecisionMade = true; // Mark decision made, prevents approval/decline now
+                this.disabled = true;
+                if (approvePlanBtn) approvePlanBtn.disabled = true;
+                if (declinePlanBtn) declinePlanBtn.disabled = true;
+                this.innerHTML = '<i class="fas fa-edit"></i> Modifying...';
+                showFeedback(planFeedback, 'Plan flagged for modification. Please review details (simulation).', 'orange');
+                addLogEntry(imranActivityLog, 'Health Action Plan flagged for MODIFICATION by Dr. Ayesha.', 'fa-edit', 'orange');
+                console.log("Ayesha: Modify Plan button clicked.");
+                // In a real app, this would open an editor or navigate somewhere.
+            }
+        });
+    } else { console.error("modifyPlanBtn not found"); }
+
+    if (declinePlanBtn) {
+        declinePlanBtn.addEventListener('click', function() {
+             if (!planApproved && !planDecisionMade) {
+                planDecisionMade = true; // Mark decision made
+                this.disabled = true;
+                if (approvePlanBtn) approvePlanBtn.disabled = true;
+                if (modifyPlanBtn) modifyPlanBtn.disabled = true;
+                this.innerHTML = '<i class="fas fa-times"></i> Declined';
+                showFeedback(planFeedback, 'Action Plan declined. Reason logged (simulation).', 'red');
+                addLogEntry(imranActivityLog, 'Health Action Plan recommendation DECLINED by Dr. Ayesha.', 'fa-times', 'red');
+                console.log("Ayesha: Decline Plan button clicked.");
+                // In a real app, might prompt for reason. Workflow stops here for this plan.
+            }
+        });
+    } else { console.error("declinePlanBtn not found"); }
+
+
+    // 2. Logistics Alert (Explicit Send/Dismiss)
+    if (sendLogisticsAlertBtn) {
+        // Note: This button's primary function might change depending on whether
+        // Ayesha's *approval* automatically triggers Imran, or if she needs to explicitly send.
+        // Current logic assumes approval triggers Imran, so this is more like a manual override/confirmation.
+        sendLogisticsAlertBtn.addEventListener('click', function() {
+            if (!logisticsAlertSent && !logisticsDecisionMade) {
+                 console.log("Ayesha: Send Logistics Alert NOW button clicked.");
+                logisticsAlertSent = true; // Mark step complete
+                logisticsDecisionMade = true;
+                this.disabled = true;
+                if (dismissLogisticsBtn) dismissLogisticsBtn.disabled = true;
+                this.innerHTML = '<i class="fas fa-paper-plane"></i> Alert Sent';
+                showFeedback(logisticsFeedback, 'Manual logistics alert sent.', 'green');
+                addLogEntry(imranActivityLog, 'Manual Logistics Alert sent by Dr. Ayesha.', 'fa-paper-plane', 'blue');
+                console.log("Ayesha: Manual Logistics Alert sent.");
+                // Potentially trigger another update for Imran if needed, or just log.
             }
         });
     } else { console.error("sendLogisticsAlertBtn not found"); }
 
-    // Imran: Confirm Dispatch -> Updates Leila's View
+     if (dismissLogisticsBtn) {
+        dismissLogisticsBtn.addEventListener('click', function() {
+             if (!logisticsAlertSent && !logisticsDecisionMade) {
+                logisticsDecisionMade = true;
+                this.disabled = true;
+                if (sendLogisticsAlertBtn) sendLogisticsAlertBtn.disabled = true;
+                this.innerHTML = '<i class="fas fa-ban"></i> Dismissed';
+                showFeedback(logisticsFeedback, 'Logistics alert recommendation dismissed.', 'red');
+                addLogEntry(imranActivityLog, 'Logistics Alert recommendation DISMISSED by Dr. Ayesha.', 'fa-ban', 'grey');
+                console.log("Ayesha: Dismiss Logistics Alert button clicked.");
+            }
+        });
+    } else { console.error("dismissLogisticsBtn not found"); }
+
+
+    // 3. Public Awareness Campaign
+    if (initiateCampaignBtn) {
+        initiateCampaignBtn.addEventListener('click', function() {
+            if (!campaignDecisionMade) {
+                campaignDecisionMade = true;
+                this.disabled = true;
+                if(scheduleCampaignBtn) scheduleCampaignBtn.disabled = true;
+                if(declineCampaignBtn) declineCampaignBtn.disabled = true;
+                this.innerHTML = '<i class="fas fa-play-circle"></i> Initiated';
+                showFeedback(campaignFeedback, 'Public awareness campaign initiated.', 'green');
+                addLogEntry(imranActivityLog, 'Public Awareness Campaign INITIATED by Dr. Ayesha.', 'fa-bullhorn', 'blue');
+                console.log("Ayesha: Initiate Campaign button clicked.");
+            }
+        });
+    } else { console.error("initiateCampaignBtn not found"); }
+
+    if (scheduleCampaignBtn) {
+        scheduleCampaignBtn.addEventListener('click', function() {
+            if (!campaignDecisionMade) {
+                campaignDecisionMade = true;
+                this.disabled = true;
+                if(initiateCampaignBtn) initiateCampaignBtn.disabled = true;
+                if(declineCampaignBtn) declineCampaignBtn.disabled = true;
+                this.innerHTML = '<i class="fas fa-calendar-alt"></i> Scheduled';
+                showFeedback(campaignFeedback, 'Campaign scheduled for later deployment.', 'orange');
+                addLogEntry(imranActivityLog, 'Public Awareness Campaign SCHEDULED by Dr. Ayesha.', 'fa-calendar-alt', 'grey');
+                console.log("Ayesha: Schedule Campaign button clicked.");
+            }
+        });
+    } else { console.error("scheduleCampaignBtn not found"); }
+
+    if (declineCampaignBtn) {
+        declineCampaignBtn.addEventListener('click', function() {
+            if (!campaignDecisionMade) {
+                campaignDecisionMade = true;
+                this.disabled = true;
+                if(initiateCampaignBtn) initiateCampaignBtn.disabled = true;
+                if(scheduleCampaignBtn) scheduleCampaignBtn.disabled = true;
+                this.innerHTML = '<i class="fas fa-times"></i> Declined';
+                showFeedback(campaignFeedback, 'Campaign recommendation declined.', 'red');
+                addLogEntry(imranActivityLog, 'Public Awareness Campaign recommendation DECLINED by Dr. Ayesha.', 'fa-times', 'grey');
+                console.log("Ayesha: Decline Campaign button clicked.");
+            }
+        });
+    } else { console.error("declineCampaignBtn not found"); }
+
+
+    // 4. School Advisory
+    if (issueAdvisoryBtn) {
+        issueAdvisoryBtn.addEventListener('click', function() {
+             if (!advisoryDecisionMade) {
+                advisoryDecisionMade = true;
+                this.disabled = true;
+                if(reviewAdvisoryBtn) reviewAdvisoryBtn.disabled = true;
+                if(declineAdvisoryBtn) declineAdvisoryBtn.disabled = true;
+                this.innerHTML = '<i class="fas fa-paper-plane"></i> Issued';
+                showFeedback(advisoryFeedback, 'School advisory issued.', 'green');
+                addLogEntry(imranActivityLog, 'School Advisory ISSUED by Dr. Ayesha.', 'fa-school', 'blue');
+                console.log("Ayesha: Issue Advisory button clicked.");
+            }
+        });
+    } else { console.error("issueAdvisoryBtn not found"); }
+
+    if (reviewAdvisoryBtn) {
+        reviewAdvisoryBtn.addEventListener('click', function() {
+             if (!advisoryDecisionMade) {
+                advisoryDecisionMade = true;
+                this.disabled = true;
+                if(issueAdvisoryBtn) issueAdvisoryBtn.disabled = true;
+                if(declineAdvisoryBtn) declineAdvisoryBtn.disabled = true;
+                this.innerHTML = '<i class="fas fa-edit"></i> Reviewing...';
+                showFeedback(advisoryFeedback, 'Advisory flagged for review/modification.', 'orange');
+                addLogEntry(imranActivityLog, 'School Advisory flagged for REVIEW by Dr. Ayesha.', 'fa-edit', 'grey');
+                console.log("Ayesha: Review Advisory button clicked.");
+            }
+        });
+    } else { console.error("reviewAdvisoryBtn not found"); }
+
+    if (declineAdvisoryBtn) {
+        declineAdvisoryBtn.addEventListener('click', function() {
+             if (!advisoryDecisionMade) {
+                advisoryDecisionMade = true;
+                this.disabled = true;
+                if(issueAdvisoryBtn) issueAdvisoryBtn.disabled = true;
+                if(reviewAdvisoryBtn) reviewAdvisoryBtn.disabled = true;
+                this.innerHTML = '<i class="fas fa-times"></i> Declined';
+                showFeedback(advisoryFeedback, 'School advisory recommendation declined.', 'red');
+                addLogEntry(imranActivityLog, 'School Advisory recommendation DECLINED by Dr. Ayesha.', 'fa-times', 'grey');
+                console.log("Ayesha: Decline Advisory button clicked.");
+            }
+        });
+    } else { console.error("declineAdvisoryBtn not found"); }
+
+
+    // --- Imran's Actions ---
     if (confirmDispatchBtn) {
+        confirmDispatchBtn.disabled = true; // Start disabled
         confirmDispatchBtn.addEventListener('click', function() {
-            if (logisticsAlertSent && !shipmentDispatched) {
-                shipmentDispatched = true;
+            console.log("Imran: Confirm Dispatch button clicked. Checking conditions (planApproved:", planApproved, "shipmentDispatched:", shipmentDispatched, ")");
+            // Ensure the MAIN plan was approved before allowing dispatch
+            if (planApproved && !shipmentDispatched) {
+                shipmentDispatched = true; // MAIN STATE CHANGE FOR WORKFLOW
                 this.disabled = true;
                 if (modifyDispatchBtn) modifyDispatchBtn.disabled = true;
                 this.innerHTML = '<i class="fas fa-truck-loading"></i> Dispatched';
-                console.log("Shipment Dispatched to Deira.");
+                addLogEntry(imranActivityLog, 'Shipment dispatch CONFIRMED.', 'fa-truck-loading', 'green');
+                console.log("Imran: Shipment Dispatched. Updating Leila's dashboard and enabling her button.");
 
                 // Update Imran's own status
                 if (shipmentStatus) {
                     shipmentStatus.innerHTML = '<i class="fas fa-shipping-fast"></i> Dispatched (ETA: 4 hours)';
-                    shipmentStatus.className = 'status-dispatched'; // You might want a CSS class for this
+                    shipmentStatus.className = 'status-dispatched';
                     shipmentStatus.style.color = 'green';
                     shipmentStatus.style.fontWeight = 'bold';
                 }
 
-                // --- Update Leila's Dashboard (Specific Action) ---
+                // --- Update Leila's Dashboard ---
                 if (leilaUrgentAlertContainer) leilaUrgentAlertContainer.style.display = 'block';
                 if (leilaUrgentAlertText) {
                     leilaUrgentAlertText.innerHTML = `<strong><i class="fas fa-truck"></i> INCOMING STOCK:</strong> Flu demand rising rapidly. Replenishment shipment (#FLU-DXB-001) is <strong>en route</strong>. <strong>ETA: Approx 4 hours.</strong> Prepare storage.`;
@@ -386,58 +591,68 @@ document.addEventListener('DOMContentLoaded', function() {
                     leilaUrgentAlertTime.textContent = `Received: ${getCurrentTime()}`;
                 }
                 if (leilaUrgentAlertContainer) {
-                    leilaUrgentAlertContainer.className = 'alert-item urgent'; // Ensure style is urgent
+                    leilaUrgentAlertContainer.className = 'alert-item urgent';
                 }
-                if (leilaActionedBtn) leilaActionedBtn.disabled = false; // Enable Leila's action button
+                if (leilaActionedBtn) {
+                     leilaActionedBtn.disabled = false;
+                     console.log("Imran: Enabled Leila's Actioned button.");
+                }
 
-                // Update Leila's forecast chart placeholder with more specific info
                 if (leilaForecastChartArea) {
                     leilaForecastChartArea.innerHTML = `<strong style="color:red;">[Forecast Update: Significant increase expected. Antivirals +300%, Vaccines +250%, Masks +150%, Sanitizers +100%]</strong>`;
                 }
-
-
-                // Optional: Switch view to Leila
-                // setTimeout(() => {
-                //     roleSelect.value = 'leila';
-                //     switchView('leila');
-                // }, 500);
+            } else {
+                 console.log("Imran: Confirm Dispatch button clicked, but conditions not met (Plan Approved:", planApproved, ")");
             }
         });
     } else { console.error("confirmDispatchBtn not found"); }
 
-    // Leila: Mark as Actioned
+    // --- Leila's Actions ---
      if (leilaActionedBtn) {
+        leilaActionedBtn.disabled = true; // Start disabled
         leilaActionedBtn.addEventListener('click', function() {
+             console.log("Leila: Mark as Actioned button clicked. Checking conditions (shipmentDispatched:", shipmentDispatched, "pharmacyPrepared:", pharmacyPrepared, ")");
             if (shipmentDispatched && !pharmacyPrepared) {
-                pharmacyPrepared = true;
+                pharmacyPrepared = true; // MAIN STATE CHANGE FOR WORKFLOW
                 this.disabled = true;
                 this.innerHTML = '<i class="fas fa-check-square"></i> Pharmacy Prepared';
-                console.log("Leila marked pharmacy as prepared.");
+                addLogEntry(imranActivityLog, 'Leila (Pharmacist) confirmed pharmacy PREPARED for delivery.', 'fa-check-square', 'blue');
+                console.log("Leila: Pharmacy Prepared. Calling updateFaisalDashboard().");
                 if(leilaConfirmationMsg) showConfirmation(leilaConfirmationMsg, 'Pharmacy marked as prepared for delivery.');
-
-                 // Update alert text to confirm preparation
-                 if (leilaUrgentAlertText) {
+                if (leilaUrgentAlertText) {
                     leilaUrgentAlertText.innerHTML += `<br><strong style='color:green;'><i class='fas fa-check-circle'></i> Pharmacy prepared for delivery.</strong>`;
                 }
+
+                // --- Update Faisal's Dashboard ---
+                updateFaisalDashboard();
+
+            } else {
+                 console.log("Leila: Mark as Actioned button clicked, but conditions not met.");
             }
         });
     } else { console.error("leilaActionedBtn not found"); }
 
 
-    // Faisal: Update based on Ayesha's action (called from Ayesha's button)
-    // This function now ONLY contains the specific updates for Faisal when the plan is approved.
+    // --- Faisal's Update Function (remains the same) ---
     function updateFaisalDashboard() {
+        console.log("--- Executing updateFaisalDashboard ---"); // Log entry into the function
+        addLogEntry(imranActivityLog, 'Faisal (Supplier) notified of increased demand signal.', 'fa-industry', 'purple');
         if (faisalDemandSignal) {
             faisalDemandSignal.innerHTML = '<strong><i class="fas fa-chart-line"></i> Signal:</strong> <span style="color:red;">URGENT - National Surge Projected!</span> Sustained high demand for flu medications projected nationally for the next 2 weeks based on Diviner aggregate forecast.';
-        }
+            console.log("Updated faisalDemandSignal.");
+        } else { console.error("faisalDemandSignal element not found!"); }
+
         if (faisalDemandChartArea) {
-            faisalDemandChartArea.innerHTML = '<strong style="color:red;">[National Trend Chart showing steep incline over next 14 days]</strong>'; // Update placeholder text
-        }
+            faisalDemandChartArea.innerHTML = '<strong style="color:red;">[National Trend Chart showing steep incline over next 14 days]</strong>';
+            console.log("Updated faisalDemandChartArea.");
+        } else { console.error("faisalDemandChartArea element not found!"); }
+
         if (faisalProdRecommendation) {
             faisalProdRecommendation.innerHTML = '<strong><i class="fas fa-cogs"></i> AI Recommendation:</strong> <span style="color:red;">PRIORITIZE PRODUCTION RUNS</span> to meet projected national surge demand.';
-        }
+            console.log("Updated faisalProdRecommendation.");
+        } else { console.error("faisalProdRecommendation element not found!"); }
+
         if (faisalProdQueue) {
-            // Clear existing queue and add prioritized items
             faisalProdQueue.innerHTML = `
                 <li class="priority-high"><strong>Flu Vaccine Batch #FV789 (URGENT)</strong></li>
                 <li class="priority-high"><strong>Antiviral Batch #AV456 (URGENT)</strong></li>
@@ -445,12 +660,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 <li>Pain Relief Med #PR789</li>
                 <li>Routine Stock Replenishment</li>
             `;
-        }
-        console.log("Faisal's dashboard updated with demand signal due to plan approval.");
+            console.log("Updated faisalProdQueue.");
+        } else { console.error("faisalProdQueue element not found!"); }
+        console.log("--- Finished updateFaisalDashboard ---");
     }
 
 
-    // Reem: Retrain Model
+    // --- Reem's Actions (remain the same) ---
     if (retrainModelBtn) {
         retrainModelBtn.addEventListener('click', function() {
             if (!modelRetrained) { // Allow retraining once per session for demo
@@ -474,13 +690,245 @@ document.addEventListener('DOMContentLoaded', function() {
     } else { console.error("retrainModelBtn not found"); }
 
 
+    // --- Dr. Ayesha ---
+    if (heatmapWhyBtn) {
+        heatmapWhyBtn.addEventListener('click', function() {
+            disableActionButtons(this); // Disable itself
+            this.innerHTML = '<i class="fas fa-info-circle"></i> Explained';
+            showFeedback(heatmapWhyFeedback, 'Heatmap reflects real-time GP reports, ER admissions, and social media velocity analysis for flu-like symptoms.', 'blue');
+            console.log("Ayesha: Heatmap 'Why?' button clicked.");
+        });
+    }
+
+
+    // --- Imran ---
+    if (modifyDispatchBtn) { // Add specific feedback for Modify Route
+        modifyDispatchBtn.addEventListener('click', function() {
+            if (planApproved && !shipmentDispatched) { // Only if plan approved but not yet dispatched
+                disableActionButtons(this); // Disable self and Confirm button
+                if (confirmDispatchBtn) confirmDispatchBtn.disabled = true;
+                this.innerHTML = '<i class="fas fa-edit"></i> Modifying Route...';
+                addLogEntry(imranActivityLog, 'Route modification requested (simulation).', 'fa-edit', 'orange');
+                console.log("Imran: Modify Route button clicked.");
+                // In real app, open route editor
+            }
+        });
+    }
+    if (imranViewStockDetailsBtn) {
+        imranViewStockDetailsBtn.addEventListener('click', function() {
+            disableActionButtons(this); // Disable buttons in this group
+            this.innerHTML = '<i class="fas fa-list-alt"></i> Viewing...';
+            showFeedback(imranStockFeedback, 'Displaying detailed stock report (simulation).', 'blue');
+            console.log("Imran: View Stock Details button clicked.");
+        });
+    }
+    if (imranAdjustThresholdsBtn) {
+        imranAdjustThresholdsBtn.addEventListener('click', function() {
+            disableActionButtons(this); // Disable buttons in this group
+            this.innerHTML = '<i class="fas fa-sliders-h"></i> Adjusting...';
+            showFeedback(imranStockFeedback, 'Opening threshold adjustment interface (simulation).', 'blue');
+            console.log("Imran: Adjust Thresholds button clicked.");
+        });
+    }
+
+
+    // --- Leila ---
+    if (leilaRequestOrderBtn) {
+        leilaRequestOrderBtn.addEventListener('click', function() {
+            disableActionButtons(this); // Disable buttons in this group
+            this.innerHTML = '<i class="fas fa-cart-plus"></i> Requested';
+            showFeedback(leilaStockFeedback, 'Manual stock order request submitted (simulation).', 'orange');
+            console.log("Leila: Request Manual Order button clicked.");
+        });
+    }
+    if (leilaViewHistoryBtn) {
+        leilaViewHistoryBtn.addEventListener('click', function() {
+            disableActionButtons(this); // Disable buttons in this group
+            this.innerHTML = '<i class="fas fa-history"></i> Viewing...';
+            showFeedback(leilaStockFeedback, 'Displaying stock order history (simulation).', 'blue');
+            console.log("Leila: View History button clicked.");
+        });
+    }
+    if (leilaApplyPromoBtn) {
+        leilaApplyPromoBtn.addEventListener('click', function() {
+            disableActionButtons(this); // Disable this button and its Dismiss counterpart
+            if(leilaDismissPromoBtn) leilaDismissPromoBtn.disabled = true;
+            this.innerHTML = '<i class="fas fa-check"></i> Applied';
+            showFeedback(leilaRecFeedback, 'Promotion suggestion applied.', 'green');
+            console.log("Leila: Apply Promo button clicked.");
+        });
+    }
+     if (leilaDismissPromoBtn) {
+        leilaDismissPromoBtn.addEventListener('click', function() {
+            disableActionButtons(this); // Disable this button and its Apply counterpart
+             if(leilaApplyPromoBtn) leilaApplyPromoBtn.disabled = true;
+            this.innerHTML = '<i class="fas fa-times"></i> Dismissed';
+            showFeedback(leilaRecFeedback, 'Promotion suggestion dismissed.', 'grey');
+            console.log("Leila: Dismiss Promo button clicked.");
+        });
+    }
+     if (leilaApplyPlacementBtn) {
+        leilaApplyPlacementBtn.addEventListener('click', function() {
+            disableActionButtons(this); // Disable this button and its Dismiss counterpart
+            if(leilaDismissPlacementBtn) leilaDismissPlacementBtn.disabled = true;
+            this.innerHTML = '<i class="fas fa-check"></i> Applied';
+            showFeedback(leilaRecFeedback, 'Placement suggestion applied.', 'green');
+            console.log("Leila: Apply Placement button clicked.");
+        });
+    }
+     if (leilaDismissPlacementBtn) {
+        leilaDismissPlacementBtn.addEventListener('click', function() {
+            disableActionButtons(this); // Disable this button and its Apply counterpart
+             if(leilaApplyPlacementBtn) leilaApplyPlacementBtn.disabled = true;
+            this.innerHTML = '<i class="fas fa-times"></i> Dismissed';
+            showFeedback(leilaRecFeedback, 'Placement suggestion dismissed.', 'grey');
+            console.log("Leila: Dismiss Placement button clicked.");
+        });
+    }
+
+
+    // --- Faisal ---
+    if (faisalAutoAdjustToggle) {
+        faisalAutoAdjustToggle.addEventListener('click', function() {
+            faisalAutoAdjustEnabled = !faisalAutoAdjustEnabled; // Toggle state
+            if (faisalAutoAdjustEnabled) {
+                this.innerHTML = '<i class="fas fa-robot"></i> Auto-adjust: ON';
+                this.classList.add('active-toggle'); // Optional: Add class for styling
+                showFeedback(faisalProdFeedback, 'AI auto-adjustment enabled for production lines.', 'green');
+                addLogEntry(imranActivityLog, 'Faisal enabled Production Auto-Adjust.', 'fa-robot', 'blue');
+            } else {
+                this.innerHTML = '<i class="fas fa-robot"></i> Auto-adjust: OFF';
+                this.classList.remove('active-toggle'); // Optional: Remove class
+                showFeedback(faisalProdFeedback, 'AI auto-adjustment disabled.', 'grey');
+                 addLogEntry(imranActivityLog, 'Faisal disabled Production Auto-Adjust.', 'fa-robot', 'grey');
+            }
+            console.log("Faisal: Auto-adjust toggled to:", faisalAutoAdjustEnabled);
+        });
+    }
+    if (faisalViewProdDetailsBtn) {
+        faisalViewProdDetailsBtn.addEventListener('click', function() {
+            // Don't disable toggle button
+            this.disabled = true;
+            if(faisalManualOverrideBtn) faisalManualOverrideBtn.disabled = true;
+            this.innerHTML = '<i class="fas fa-list-alt"></i> Viewing...';
+            showFeedback(faisalProdFeedback, 'Displaying detailed production line status (simulation).', 'blue');
+            console.log("Faisal: View Production Details button clicked.");
+        });
+    }
+    if (faisalManualOverrideBtn) {
+        faisalManualOverrideBtn.addEventListener('click', function() {
+             // Don't disable toggle button
+            this.disabled = true;
+             if(faisalViewProdDetailsBtn) faisalViewProdDetailsBtn.disabled = true;
+            this.innerHTML = '<i class="fas fa-user-cog"></i> Overriding...';
+            showFeedback(faisalProdFeedback, 'Manual production override initiated (simulation).', 'orange');
+            addLogEntry(imranActivityLog, 'Faisal initiated Manual Production Override.', 'fa-user-cog', 'orange');
+            console.log("Faisal: Manual Override button clicked.");
+        });
+    }
+    if (faisalViewSuppliersBtn) {
+        faisalViewSuppliersBtn.addEventListener('click', function() {
+            disableActionButtons(this); // Disable buttons in this group
+            this.innerHTML = '<i class="fas fa-users"></i> Viewing...';
+            showFeedback(faisalMaterialFeedback, 'Displaying raw material supplier list (simulation).', 'blue');
+            console.log("Faisal: View Suppliers button clicked.");
+        });
+    }
+    if (faisalPlaceMaterialOrderBtn) {
+        faisalPlaceMaterialOrderBtn.addEventListener('click', function() {
+            disableActionButtons(this); // Disable buttons in this group
+            this.innerHTML = '<i class="fas fa-shopping-cart"></i> Ordering...';
+            showFeedback(faisalMaterialFeedback, 'Placing raw material order (simulation).', 'green');
+            addLogEntry(imranActivityLog, 'Faisal placed raw material order.', 'fa-shopping-cart', 'blue');
+            console.log("Faisal: Place Material Order button clicked.");
+        });
+    }
+
+
+    // --- Reem ---
+    if (reemRunSimulationBtn) {
+        reemRunSimulationBtn.addEventListener('click', function() {
+            disableActionButtons(this); // Disable buttons in this group
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Running...';
+            showFeedback(reemSimFeedback, 'Running outbreak response simulation...', 'blue');
+            console.log("Reem: Run Simulation button clicked.");
+            // Simulate completion
+            setTimeout(() => {
+                this.innerHTML = '<i class="fas fa-play"></i> Run Simulation';
+                 showFeedback(reemSimFeedback, 'Simulation complete. Results available.', 'green');
+                 this.disabled = false;
+                 if(reemCompareModelsBtn) reemCompareModelsBtn.disabled = false;
+            }, 2500);
+        });
+    }
+    if (reemCompareModelsBtn) {
+        reemCompareModelsBtn.addEventListener('click', function() {
+            disableActionButtons(this); // Disable buttons in this group
+            this.innerHTML = '<i class="fas fa-exchange-alt"></i> Comparing...';
+            showFeedback(reemSimFeedback, 'Comparing model performance metrics (simulation).', 'blue');
+            console.log("Reem: Compare Models button clicked.");
+        });
+    }
+     if (reemDeployUpdateBtn) {
+        reemDeployUpdateBtn.addEventListener('click', function() {
+            disableActionButtons(this); // Disable buttons in this group
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deploying...';
+            showFeedback(reemDeployFeedback, 'Deploying model update to production...', 'blue');
+            console.log("Reem: Deploy Update button clicked.");
+             // Simulate completion
+            setTimeout(() => {
+                this.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Deploy Update';
+                 showFeedback(reemDeployFeedback, 'Model update deployed successfully.', 'green');
+                 this.disabled = false;
+                 if(reemRollbackBtn) reemRollbackBtn.disabled = false;
+            }, 2000);
+        });
+    }
+     if (reemRollbackBtn) {
+        reemRollbackBtn.addEventListener('click', function() {
+            disableActionButtons(this); // Disable buttons in this group
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Rolling Back...';
+            showFeedback(reemDeployFeedback, 'Rolling back to previous model version...', 'orange');
+            console.log("Reem: Rollback button clicked.");
+             // Simulate completion
+            setTimeout(() => {
+                this.innerHTML = '<i class="fas fa-undo"></i> Rollback';
+                 showFeedback(reemDeployFeedback, 'Rollback complete. Previous model active.', 'red');
+                 this.disabled = false;
+                 if(reemDeployUpdateBtn) reemDeployUpdateBtn.disabled = false;
+            }, 1500);
+        });
+    }
+
+
     // --- Initial Setup ---
-    processDataForDashboard(); // Process data and update ALL dashboards with initial context on load
+    console.log("--- Initial Setup ---");
+    processDataForDashboard(); // Process data and update Dr. Ayesha's dashboard on load
     switchView(roleSelect.value); // Set initial view
-    // Ensure buttons that depend on prior actions are initially disabled
-    if (sendLogisticsAlertBtn) sendLogisticsAlertBtn.disabled = !planApproved;
-    if (confirmDispatchBtn) confirmDispatchBtn.disabled = !logisticsAlertSent;
-    if (modifyDispatchBtn) modifyDispatchBtn.disabled = !logisticsAlertSent;
-    if (leilaActionedBtn) leilaActionedBtn.disabled = !shipmentDispatched;
+
+    // Initial button states - disable buttons based on workflow state vars
+    if (approvePlanBtn) approvePlanBtn.disabled = planApproved || planDecisionMade;
+    if (modifyPlanBtn) modifyPlanBtn.disabled = planApproved || planDecisionMade;
+    if (declinePlanBtn) declinePlanBtn.disabled = planApproved || planDecisionMade;
+
+    if (sendLogisticsAlertBtn) sendLogisticsAlertBtn.disabled = logisticsAlertSent || logisticsDecisionMade;
+    if (dismissLogisticsBtn) dismissLogisticsBtn.disabled = logisticsAlertSent || logisticsDecisionMade;
+
+    if (initiateCampaignBtn) initiateCampaignBtn.disabled = campaignDecisionMade;
+    if (scheduleCampaignBtn) scheduleCampaignBtn.disabled = campaignDecisionMade;
+    if (declineCampaignBtn) declineCampaignBtn.disabled = campaignDecisionMade;
+
+    if (issueAdvisoryBtn) issueAdvisoryBtn.disabled = advisoryDecisionMade;
+    if (reviewAdvisoryBtn) reviewAdvisoryBtn.disabled = advisoryDecisionMade;
+    if (declineAdvisoryBtn) declineAdvisoryBtn.disabled = advisoryDecisionMade;
+
+    // Workflow buttons
+    if (confirmDispatchBtn) confirmDispatchBtn.disabled = !planApproved || shipmentDispatched;
+    if (modifyDispatchBtn) modifyDispatchBtn.disabled = !planApproved || shipmentDispatched;
+    if (leilaActionedBtn) leilaActionedBtn.disabled = !shipmentDispatched || pharmacyPrepared;
+
+    console.log("Initial button states set.");
+    // console.log("Initial State: planApproved:", planApproved, "logisticsAlertSent:", logisticsAlertSent, "shipmentDispatched:", shipmentDispatched, "pharmacyPrepared:", pharmacyPrepared);
+    console.log("---------------------");
 
 }); 
