@@ -190,6 +190,72 @@ main {
     border: 1px solid #dee2e6;
     margin-top: 0.5rem;
     font-style: italic;
+    padding: 10px; /* Add padding for chart content */
+    position: relative; /* For potential absolute positioning inside */
+    overflow: hidden; /* Prevent overflow */
+}
+
+/* Styles for Simple Bar Charts */
+.chart-area.bar-chart {
+   display: flex; /* Use flexbox for bars */
+   align-items: flex-end; /* Align bars to the bottom */
+   justify-content: space-around; /* Space out bars */
+   height: 150px; /* Ensure consistent height */
+   padding-bottom: 20px; /* Space for labels */
+   position: relative;
+   background-color: #f8f9fa; /* Ensure background is consistent */
+   border: 1px solid #dee2e6; /* Ensure border is consistent */
+   overflow: hidden; /* Prevent overflow */
+}
+
+.bar-chart .bar {
+   background-color: #f0ad4e; /* Leila's chart bar color (Orange) */
+   width: 15%; /* Adjust width as needed */
+   max-width: 50px; /* Slightly wider maybe */
+   position: relative; /* For label positioning */
+   text-align: center;
+   transition: height 0.5s ease-out; /* Animate height changes */
+   border-radius: 3px 3px 0 0; /* Slightly rounded top */
+}
+
+.bar-chart .bar span { /* Label below bar */
+   position: absolute;
+   bottom: -20px;
+   left: 50%;
+   transform: translateX(-50%);
+   font-size: 0.7em;
+   color: #555;
+   white-space: nowrap;
+}
+.bar-chart .bar .value { /* Value above bar */
+   position: absolute;
+   top: -18px;
+   left: 50%;
+   transform: translateX(-50%);
+   font-size: 0.7em;
+   color: #333;
+   font-weight: bold;
+}
+
+/* Styles for Reem's Comparison */
+.comparison-chart {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    text-align: center;
+}
+.comparison-item {
+    padding: 10px;
+}
+.comparison-item strong {
+    display: block;
+    margin-bottom: 5px;
+    color: #1a4a8a;
+}
+.comparison-item .metric {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #0a2e5c;
 }
 
 /* Loop Diagram Specific Styles */
@@ -457,11 +523,6 @@ footer p {
 }
 
 /* Simulated Map Styles */
-.map-area, .route-placeholder, .chart-area {
-    position: relative; /* Needed for absolute positioning of elements inside */
-    overflow: hidden; /* Hide parts of SVG that might overflow */
-}
-
 .simulated-heatmap, .simulated-route-map, .simulated-national-map {
     background-color: #d0e0f0; /* Light blue background like a map */
     border: 1px solid #a0b0c0;
@@ -562,28 +623,42 @@ footer p {
 .simulated-route-map .point-pharmacy1 { top: 40%; left: 60%; }
 .simulated-route-map .point-pharmacy2 { top: 70%; left: 40%; }
 
-/* Faisal's National Map */
-.simulated-national-map .map-zone {
-     position: absolute;
-     border: 1px solid rgba(0,0,0,0.2);
-     border-radius: 4px;
-     display: flex;
-     justify-content: center;
-     align-items: center;
-     text-align: center;
-     padding: 2px;
-     font-weight: bold;
-     color: rgba(0,0,0,0.7);
-     background-color: rgba(0, 128, 0, 0.3); /* Default green */
+/* Styles for Simple Line Charts (SVG - Used by Faisal) */
+.chart-area.line-chart {
+   padding: 0; /* SVG handles its own spacing */
 }
-.simulated-national-map .zone-north { top: 10%; left: 30%; width: 40%; height: 25%; }
-.simulated-national-map .zone-central { top: 40%; left: 20%; width: 60%; height: 30%; }
-.simulated-national-map .zone-south { top: 75%; left: 40%; width: 30%; height: 20%; }
-.simulated-national-map .zone-alert {
-    background-color: rgba(255, 0, 0, 0.6); /* Red for alert */
-    border-color: darkred;
-    color: white;
-    z-index: 2;
+
+.line-chart svg {
+   width: 100%;
+   height: 100%;
+}
+
+.line-chart .grid-line {
+   stroke: #e0e0e0;
+   stroke-dasharray: 2,2;
+   stroke-width: 0.5;
+}
+
+.line-chart .axis-line {
+   stroke: #aaa;
+   stroke-width: 1;
+}
+
+.line-chart .data-line {
+   fill: none;
+   stroke: #d9534f; /* Red line for national demand */
+   stroke-width: 2;
+}
+
+.line-chart .axis-label {
+   font-size: 8px;
+   fill: #555;
+}
+.line-chart .chart-title {
+   font-size: 10px;
+   font-weight: bold;
+   fill: #333;
+   text-anchor: middle;
 }
 
 /* Modal Styles */
@@ -657,4 +732,19 @@ footer p {
 }
 
 /* Responsive Adjustments */
-/* ... existing responsive styles ... */ 
+/* ... existing responsive styles ... */
+
+/* KPI Static Styles */
+.kpi-item {
+  margin: 12px 0;
+}
+.kpi-label {
+  font-weight: 500;
+}
+.kpi-value {
+  margin-left: 8px;
+  font-weight: bold;
+}
+.kpi-value.success {
+  color: #28a745;
+} 
