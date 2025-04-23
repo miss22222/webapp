@@ -478,33 +478,67 @@ footer p {
     font-style: italic;
 }
 
-/* Ayesha's Heatmap */
-.simulated-heatmap .map-region {
-    position: absolute;
-    border: 1px solid rgba(0,0,0,0.2);
-    border-radius: 4px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    padding: 2px;
-    font-weight: bold;
-    color: rgba(0,0,0,0.7);
+/* Ayesha's Heatmap - UPDATED for Map Simulation */
+.simulated-heatmap {
+    background-color: #d0e0f0; /* Light blue 'map' background */
+    /* Optional: Add a subtle pattern or gradient */
+    background-image: linear-gradient(45deg, #e0f0ff 25%, transparent 25%, transparent 75%, #e0f0ff 75%, #e0f0ff),
+                      linear-gradient(-45deg, #e0f0ff 25%, transparent 25%, transparent 75%, #e0f0ff 75%, #e0f0ff);
+    background-size: 20px 20px;
+    border: 1px solid #a0b0c0;
+    min-height: 200px; /* Slightly taller maybe */
+    padding: 150px; /* Increased padding */
+    position: relative; /* Crucial for positioning points */
+    font-size: 0.75em;
+    overflow: hidden; /* Hide parts of points outside bounds */
 }
-.simulated-heatmap .region-deira {
-    top: 30%; left: 40%; width: 30%; height: 40%;
-    background-color: rgba(255, 0, 0, 0.6); /* Red for high alert */
-    border-color: darkred;
-    color: white;
-    z-index: 2; /* Ensure it's on top */
+
+/* Styles for Risk Points (Circles) */
+.simulated-heatmap .map-risk-point {
+   position: absolute;
+   width: 25px; /* Size of the circle */
+   height: 25px;
+   border-radius: 50%; /* Make it a circle */
+   border: 1px solid rgba(0, 0, 0, 0.3);
+   box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   font-size: 0.9em; /* Adjust text size inside circle if needed */
+   font-weight: bold;
+   color: rgba(0,0,0,0.7); /* Default text color */
+   /* Use transform for centering on the coordinate */
+   transform: translate(-50%, -50%);
+   transition: background-color 0.3s ease, transform 0.3s ease;
 }
-.simulated-heatmap .region-burdubai {
-    top: 60%; left: 15%; width: 25%; height: 30%;
-    background-color: rgba(255, 165, 0, 0.4); /* Orange for medium */
+
+.simulated-heatmap .map-risk-point:hover {
+   transform: translate(-50%, -50%) scale(1.1); /* Slightly enlarge on hover */
+   z-index: 10; /* Bring to front on hover */
 }
-.simulated-heatmap .region-jumeirah {
-    top: 20%; left: 10%; width: 20%; height: 30%;
-    background-color: rgba(0, 128, 0, 0.3); /* Green for low */
+
+/* Apply Risk Level Colors to Points */
+.simulated-heatmap .risk-low {
+   background-color: rgba(132, 217, 132, 0.8); /* Semi-transparent green */
+   border-color: #4cae4c;
+   color: #155724;
+}
+.simulated-heatmap .risk-medium {
+   background-color: rgba(255, 213, 79, 0.8); /* Semi-transparent yellow */
+   border-color: #ffc107;
+   color: #856404;
+}
+.simulated-heatmap .risk-high {
+   background-color: rgba(240, 128, 128, 0.8); /* Semi-transparent red */
+   border-color: #dc3545;
+   color: #721c24;
+}
+.simulated-heatmap .risk-critical {
+   background-color: rgba(220, 53, 69, 0.9); /* Stronger semi-transparent red */
+   border-color: #a51827;
+   color: white;
+   width: 30px; /* Make critical points slightly larger */
+   height: 30px;
 }
 
 /* Imran's Route Map */
