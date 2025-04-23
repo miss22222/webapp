@@ -188,17 +188,25 @@ document.addEventListener('DOMContentLoaded', function() {
     const reemRollbackBtn = document.getElementById('reemRollbackBtn');
     const reemDeployFeedback = document.getElementById('reemDeployFeedback');
 
-    // --- State Variables (Simple Simulation) ---
+    // NEW: Summary View Refs
+    const kpiShortages = document.getElementById('kpiShortages');
+    const kpiResponseTime = document.getElementById('kpiResponseTime');
+    const kpiWastage = document.getElementById('kpiWastage');
+    const kpiEfficiency = document.getElementById('kpiEfficiency');
+    const impactChartCost = document.getElementById('impactChartCost');
+    const impactChartLives = document.getElementById('impactChartLives');
+    const impactChartSustainability = document.getElementById('impactChartSustainability');
+
+    // --- State Variables ---
     let planApproved = false;
-    let planDecisionMade = false; // Track if Modify/Decline was clicked for the main plan
-    let logisticsAlertSent = false; // Tracks if the explicit "Send Alert Now" was clicked
+    let logisticsAlertSent = false; // If separate alert button is used
+    let shipmentDispatched = false;
+    let pharmacyPrepared = false; // This will be our trigger for "workflow complete"
+    let planDecisionMade = false;
     let logisticsDecisionMade = false;
     let campaignDecisionMade = false;
     let advisoryDecisionMade = false;
-    let shipmentDispatched = false;
-    let pharmacyPrepared = false;
-    let modelRetrained = false;
-    let faisalAutoAdjustEnabled = false; // State for toggle
+    let faisalAutoAdjustEnabled = false;
 
     // --- Helper Functions ---
     function showConfirmation(element, message) {
@@ -311,8 +319,13 @@ document.addEventListener('DOMContentLoaded', function() {
             ayeshaAlertText.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ALERT: Flu Surge Detected in Deira (${overallConfirmationRate}% confirmation rate)`;
         }
         if (ayeshaHeatmapArea) {
-            ayeshaHeatmapArea.innerHTML = `<strong>Deira Clinic Activity (Confirmed Cases):</strong><br>${heatmapSummary || 'No confirmed cases reported.'}`;
-            ayeshaHeatmapArea.style.fontSize = '0.9em'; // Adjust font size if needed
+            // Inject simulated heatmap HTML
+            ayeshaHeatmapArea.innerHTML = `
+                <div class="map-region region-jumeirah">Jumeirah (Low)</div>
+                <div class="map-region region-burdubai">Bur Dubai (Med)</div>
+                <div class="map-region region-deira">Deira (High)</div>
+                <div style="position:absolute; bottom: 5px; right: 5px; font-size:0.8em; background:rgba(255,255,255,0.7); padding: 2px;">Simulated Zones</div>
+            `;
         }
         if (ayeshaTrendChartArea) {
             ayeshaTrendChartArea.innerHTML = `<strong>Daily Visits (Symptom Reports):</strong><br><div style="height: 60px; border: 1px solid #ccc; padding: 5px; overflow-x: auto; white-space: nowrap;">${trendSummary || 'No visit data.'}</div>`;
@@ -327,18 +340,24 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
 
-    // --- View Switching Logic (Original) ---
+    // --- View Switching Logic (Updated) ---
     function switchView(selectedRole) {
+        console.log(`Attempting to switch view to: ${selectedRole}`); // Add log
         dashboardViews.forEach(view => {
             view.classList.remove('active-view');
         });
+
+        // Construct the ID based on the selected role value
         const viewId = `view-${selectedRole}`;
         const activeView = document.getElementById(viewId);
+
         if (activeView) {
             activeView.classList.add('active-view');
-            console.log(`Switched to view: ${viewId}`);
+            console.log(`Successfully switched to view: ${viewId}`);
         } else {
-            console.warn(`View ID not found: ${viewId}`);
+            // Handle cases where the ID might not follow the pattern (though it does here)
+            // Or log an error if the element truly doesn't exist.
+            console.error(`View element not found for ID: ${viewId}`);
         }
     }
 
@@ -350,7 +369,38 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- Dr. Ayesha's Recommendations ---
 
-    // 1. Health Action Plan
+    // 0. View Plan Button (Doesn't affect state)
+    if (viewPlanBtn) {
+        viewPlanBtn.addEventListener('click', function() {
+            console.log("Ayesha: View Plan button clicked.");
+            // Populate modal content
+            if (modalBody) {
+                modalBody.innerHTML = `
+                    <p><strong>Objective:</strong> Mitigate Flu Surge Impact in Deira Region.</p>
+                    <h4>Key Actions:</h4>
+                    <ol>
+                        <li><strong>Resource Allocation:</strong> Prioritize Deira clinics/hospitals for staffing & ventilator support. (Trigger: Operational Strain > 4)</li>
+                        <li><strong>Logistics Trigger:</strong> Authorize Imran (Logistics) to initiate stock redistribution based on AI forecast. (Trigger: This Approval)</li>
+                        <li><strong>Public Health Comms:</strong> Launch targeted awareness campaign (Rec #3).</li>
+                        <li><strong>School Protocols:</strong> Issue advisory for enhanced screening (Rec #4).</li>
+                        <li><strong>Monitoring:</strong> Increase frequency of data pulls from GP/Social Media feeds.</li>
+                    </ol>
+                    <p><strong>Estimated Duration:</strong> 7-10 days active phase.</p>
+                    <p><strong>Success Metrics:</strong> ICU demand below 90% capacity, Shortage prevention > 95%.</p>
+                `;
+            }
+
+            // Show the modal
+            if (planModal) {
+                planModal.style.display = 'block';
+            }
+
+            showFeedback(planFeedback, 'Displaying simulated plan details.', 'blue');
+            // Note: This button does NOT disable others or change main state variables.
+        });
+    } else { console.error("viewPlanBtn not found"); }
+
+    // 1. Health Action Plan (Approve/Modify/Decline)
     if (approvePlanBtn) {
         approvePlanBtn.addEventListener('click', function() {
             if (!planApproved && !planDecisionMade) {
@@ -368,28 +418,61 @@ document.addEventListener('DOMContentLoaded', function() {
                 // --- Update Imran's Dashboard ---
                 const overallConfirmationRate = patientData.length > 0 ? ((patientData.filter(p => p.ConfirmedFlu === "Yes").length / patientData.length) * 100).toFixed(1) : 0;
                 if (imranAlertMessage) {
-                    imranAlertMessage.innerHTML = `<strong style="color: red;"><i class="fas fa-exclamation-triangle"></i> URGENT ALERT:</strong> Health Action Plan approved. High flu activity confirmed (${overallConfirmationRate}% rate). Prepare for stock redistribution.`;
+                    imranAlertMessage.innerHTML = '<i class="fas fa-check-circle" style="color: green;"></i> ACTION: Health Action Plan Approved. Proceed with redistribution.';
+                    imranAlertMessage.style.color = 'green';
+                    imranAlertMessage.style.fontWeight = 'bold';
                 }
-                if (imranActionMessage) {
-                    imranActionMessage.innerHTML = `<strong><i class="fas fa-random"></i> Action Required:</strong> Review AI recommended redistribution plan below.`;
-                }
-                if (imranRouteDetails) {
-                    imranRouteDetails.style.display = 'block';
-                }
-                if (confirmDispatchBtn) {
-                    confirmDispatchBtn.disabled = false;
-                    console.log("Ayesha: Enabled Imran's Confirm Dispatch button.");
-                }
-                if (modifyDispatchBtn) modifyDispatchBtn.disabled = false;
-
                 if (imranShortfallMessage) {
-                    imranShortfallMessage.innerHTML = `Projected Shortfall (Deira Hub, 48h): <strong style="color:red;">Vaccines: ~3,500 units, Antivirals: ~2,200 units</strong>`;
+                    imranShortfallMessage.textContent = 'Forecasted Shortfall (Next 48h): Antivirals - 450 units, Vaccines - 600 units.';
                     imranShortfallMessage.style.color = 'red';
                 }
+                if (imranActionMessage) {
+                    imranActionMessage.textContent = 'AI Recommendation: Initiate Route Plan Alpha (Hub -> Pharmacy A -> Pharmacy B). Prioritize Antivirals.';
+                }
+                if (imranRouteDetails) {
+                    // Inject simulated route map SVG + HTML points
+                    imranRouteDetails.innerHTML = `
+                        <div class="map-point point-hub"><i class="fas fa-warehouse"></i> Hub</div>
+                        <div class="map-point point-pharmacy1"><i class="fas fa-clinic-medical"></i> Pharm A</div>
+                        <div class="map-point point-pharmacy2"><i class="fas fa-clinic-medical"></i> Pharm B</div>
+                        <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+                            <!-- Dashed line for planned route -->
+                            <polyline points="20,20 65,45 45,75" fill="none" stroke="#0a2e5c" stroke-width="2" stroke-dasharray="4,2"/>
+                            <!-- Optional: Arrow heads (simple triangles) -->
+                            <polygon points="65,45 62,43 62,47" fill="#0a2e5c" />
+                            <polygon points="45,75 43,72 47,72" fill="#0a2e5c" />
+                        </svg>
+                        <div style="position:absolute; bottom: 5px; right: 5px; font-size:0.8em; background:rgba(255,255,255,0.7); padding: 2px;">Route Alpha</div>
+                    `;
+                }
+                if (confirmDispatchBtn) confirmDispatchBtn.disabled = false;
+                if (modifyDispatchBtn) modifyDispatchBtn.disabled = false;
+
                 if (shipmentStatus) {
-                    shipmentStatus.innerHTML = '<i class="fas fa-tasks"></i> Plan Approved - Awaiting Dispatch Confirmation';
-                    shipmentStatus.className = 'status-pending';
-                    shipmentStatus.style.color = 'orange';
+                    shipmentStatus.innerHTML = '<i class="fas fa-shipping-fast"></i> Dispatched (ETA: 4 hours)';
+                    shipmentStatus.className = 'status-dispatched';
+                    shipmentStatus.style.color = 'green';
+                    shipmentStatus.style.fontWeight = 'bold';
+                }
+
+                // --- Update Leila's Dashboard ---
+                if (leilaUrgentAlertContainer) leilaUrgentAlertContainer.style.display = 'block';
+                if (leilaUrgentAlertText) {
+                    leilaUrgentAlertText.innerHTML = `<strong><i class="fas fa-truck"></i> INCOMING STOCK:</strong> Flu demand rising rapidly. Replenishment shipment (#FLU-DXB-001) is <strong>en route</strong>. <strong>ETA: Approx 4 hours.</strong> Prepare storage.`;
+                }
+                 if (leilaUrgentAlertTime) {
+                    leilaUrgentAlertTime.textContent = `Received: ${getCurrentTime()}`;
+                }
+                if (leilaUrgentAlertContainer) {
+                    leilaUrgentAlertContainer.className = 'alert-item urgent';
+                }
+                if (leilaActionedBtn) {
+                     leilaActionedBtn.disabled = false;
+                     console.log("Imran: Enabled Leila's Actioned button.");
+                }
+
+                if (leilaForecastChartArea) {
+                    leilaForecastChartArea.innerHTML = `<strong style="color:red;">[Forecast Update: Significant increase expected. Antivirals +300%, Vaccines +250%, Masks +150%, Sanitizers +100%]</strong>`;
                 }
             } else {
                  console.log("Ayesha: Approve Plan button clicked, but plan already approved or decision made.");
@@ -611,23 +694,23 @@ document.addEventListener('DOMContentLoaded', function() {
      if (leilaActionedBtn) {
         leilaActionedBtn.disabled = true; // Start disabled
         leilaActionedBtn.addEventListener('click', function() {
-             console.log("Leila: Mark as Actioned button clicked. Checking conditions (shipmentDispatched:", shipmentDispatched, "pharmacyPrepared:", pharmacyPrepared, ")");
+             console.log("Leila: Mark as Actioned button clicked. Checking conditions (shipmentDispatched:", shipmentDispatched, ", pharmacyPrepared:", pharmacyPrepared, ")");
             if (shipmentDispatched && !pharmacyPrepared) {
-                pharmacyPrepared = true; // MAIN STATE CHANGE FOR WORKFLOW
+                pharmacyPrepared = true; // WORKFLOW STEP COMPLETE
                 this.disabled = true;
-                this.innerHTML = '<i class="fas fa-check-square"></i> Pharmacy Prepared';
+                this.innerHTML = '<i class="fas fa-check-double"></i> Actioned & Ready';
+                showConfirmation(leilaConfirmationMsg, 'Stock received and pharmacy prepared. Supplier notified.');
                 addLogEntry(imranActivityLog, 'Leila (Pharmacist) confirmed pharmacy PREPARED for delivery.', 'fa-check-square', 'blue');
-                console.log("Leila: Pharmacy Prepared. Calling updateFaisalDashboard().");
-                if(leilaConfirmationMsg) showConfirmation(leilaConfirmationMsg, 'Pharmacy marked as prepared for delivery.');
-                if (leilaUrgentAlertText) {
-                    leilaUrgentAlertText.innerHTML += `<br><strong style='color:green;'><i class='fas fa-check-circle'></i> Pharmacy prepared for delivery.</strong>`;
-                }
 
+                console.log("Leila: Pharmacy Prepared. Calling updateFaisalDashboard() and updateSummaryViews().");
                 // --- Update Faisal's Dashboard ---
                 updateFaisalDashboard();
+                // --- Update Summary Views (KPIs/Impact) ---
+                updateSummaryViews(); // <-- UPDATE SUMMARY VIEWS
 
             } else {
-                 console.log("Leila: Mark as Actioned button clicked, but conditions not met.");
+                console.warn("Leila: Actioned button clicked, but conditions not met.");
+                showFeedback(leilaConfirmationMsg, 'Cannot mark as actioned yet. Shipment may not be dispatched.', 'red');
             }
         });
     } else { console.error("leilaActionedBtn not found"); }
@@ -643,7 +726,13 @@ document.addEventListener('DOMContentLoaded', function() {
         } else { console.error("faisalDemandSignal element not found!"); }
 
         if (faisalDemandChartArea) {
-            faisalDemandChartArea.innerHTML = '<strong style="color:red;">[National Trend Chart showing steep incline over next 14 days]</strong>';
+            // Inject simulated national map HTML
+            faisalDemandChartArea.innerHTML = `
+                <div class="map-zone zone-north">North (Stable)</div>
+                <div class="map-zone zone-central zone-alert">Central (High Demand)</div>
+                <div class="map-zone zone-south">South (Stable)</div>
+                <div style="position:absolute; bottom: 5px; right: 5px; font-size:0.8em; background:rgba(255,255,255,0.7); padding: 2px;">National Demand Zones</div>
+            `;
             console.log("Updated faisalDemandChartArea.");
         } else { console.error("faisalDemandChartArea element not found!"); }
 
@@ -901,34 +990,90 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
 
+    // --- NEW: Summary View Update Function ---
+    function updateSummaryViews() {
+        console.log("--- Executing updateSummaryViews ---");
+        const workflowComplete = pharmacyPrepared; // Use this state variable
+
+        // Update KPIs
+        if (kpiShortages) kpiShortages.textContent = workflowComplete ? '98%' : '95%'; // Slightly improve on completion
+        if (kpiResponseTime) kpiResponseTime.textContent = '3x Faster'; // Static example
+        if (kpiWastage) kpiWastage.textContent = workflowComplete ? '60%' : '55%'; // Slightly improve on completion
+        if (kpiEfficiency) {
+            kpiEfficiency.textContent = workflowComplete ? 'High' : 'Medium';
+            kpiEfficiency.style.color = workflowComplete ? 'green' : 'orange';
+        }
+
+        // Update Impact Charts (Simulated)
+        if (impactChartCost) {
+            impactChartCost.innerHTML = `
+                <div style="font-size: 0.9em; text-align: left;">
+                    <p><strong>Baseline Costs:</strong></p>
+                    <div style="width: 100%; background-color: #ddd; height: 20px; border-radius: 5px; margin-bottom: 5px;"><div style="width: 80%; background-color: #dc3545; height: 100%; border-radius: 5px;"></div></div>
+                    <p><strong>Diviner Optimized Costs:</strong></p>
+                    <div style="width: 100%; background-color: #ddd; height: 20px; border-radius: 5px;"><div style="width: ${workflowComplete ? '50%' : '55%'}; background-color: #28a745; height: 100%; border-radius: 5px;"></div></div>
+                    <small>(Simulated reduction in emergency response, wastage, hospitalization)</small>
+                </div>`;
+        }
+        if (impactChartLives) {
+             impactChartLives.innerHTML = `
+                 <div style="font-size: 0.9em; text-align: left;">
+                    <p><i class="fas fa-check-circle" style="color: green;"></i> Faster medication access during surge: <strong>${workflowComplete ? 'Achieved' : 'In Progress'}</strong></p>
+                    <p><i class="fas fa-check-circle" style="color: green;"></i> Reduced outbreak severity potential: <strong>${workflowComplete ? 'Improved' : 'Projected'}</strong></p>
+                    <p><i class="fas fa-check-circle" style="color: green;"></i> Enhanced community health resilience: <strong>${workflowComplete ? 'Strengthened' : 'Targeted'}</strong></p>
+                    <p style="margin-top: 10px;"><i class="fas fa-users" style="color:#4a90e2;"></i> Focus: Ensuring vulnerable populations receive timely care.</p>
+                 </div>`;
+        }
+        if (impactChartSustainability) {
+            impactChartSustainability.innerHTML = `
+                 <div style="font-size: 0.9em; text-align: left;">
+                    <p><strong>Carbon Footprint (Logistics):</strong></p>
+                    <div style="height: 60px; border: 1px solid #ccc; padding: 5px; position: relative;">
+                        <svg width="100%" height="100%" viewBox="0 0 100 50" preserveAspectRatio="none">
+                          <polyline points="0,40 20,35 40,30 60,${workflowComplete ? 20 : 25} 80,${workflowComplete ? 15 : 20} 100,${workflowComplete ? 10 : 18}" fill="none" stroke="#dc3545" stroke-width="1" />
+                          <polyline points="0,40 20,35 40,30 60,${workflowComplete ? 20 : 25} 80,${workflowComplete ? 15 : 20} 100,${workflowComplete ? 10 : 18}" fill="none" stroke="#28a745" stroke-width="2" />
+                          <text x="5" y="10" font-size="5">Baseline</text>
+                          <text x="70" y="${workflowComplete ? 5 : 13}" font-size="5" fill="#28a745">Optimized</text>
+                        </svg>
+                    </div>
+                    <small>(Simulated reduction via optimized routes & less wastage)</small>
+                 </div>`;
+        }
+        console.log("--- Finished updateSummaryViews ---");
+    }
+
+
     // --- Initial Setup ---
     console.log("--- Initial Setup ---");
-    processDataForDashboard(); // Process data and update Dr. Ayesha's dashboard on load
-    switchView(roleSelect.value); // Set initial view
+    processDataForDashboard(); // Update Ayesha's view
+    updateSummaryViews(); // <-- SET INITIAL SUMMARY VIEW CONTENT
+    switchView(roleSelect.value); // Set initial view based on dropdown
 
     // Initial button states - disable buttons based on workflow state vars
-    if (approvePlanBtn) approvePlanBtn.disabled = planApproved || planDecisionMade;
-    if (modifyPlanBtn) modifyPlanBtn.disabled = planApproved || planDecisionMade;
-    if (declinePlanBtn) declinePlanBtn.disabled = planApproved || planDecisionMade;
-
-    if (sendLogisticsAlertBtn) sendLogisticsAlertBtn.disabled = logisticsAlertSent || logisticsDecisionMade;
-    if (dismissLogisticsBtn) dismissLogisticsBtn.disabled = logisticsAlertSent || logisticsDecisionMade;
-
-    if (initiateCampaignBtn) initiateCampaignBtn.disabled = campaignDecisionMade;
-    if (scheduleCampaignBtn) scheduleCampaignBtn.disabled = campaignDecisionMade;
-    if (declineCampaignBtn) declineCampaignBtn.disabled = campaignDecisionMade;
-
-    if (issueAdvisoryBtn) issueAdvisoryBtn.disabled = advisoryDecisionMade;
-    if (reviewAdvisoryBtn) reviewAdvisoryBtn.disabled = advisoryDecisionMade;
-    if (declineAdvisoryBtn) declineAdvisoryBtn.disabled = advisoryDecisionMade;
-
-    // Workflow buttons
-    if (confirmDispatchBtn) confirmDispatchBtn.disabled = !planApproved || shipmentDispatched;
-    if (modifyDispatchBtn) modifyDispatchBtn.disabled = !planApproved || shipmentDispatched;
-    if (leilaActionedBtn) leilaActionedBtn.disabled = !shipmentDispatched || pharmacyPrepared;
+    updateButtonStates(); // Use the helper function
 
     console.log("Initial button states set.");
-    // console.log("Initial State: planApproved:", planApproved, "logisticsAlertSent:", logisticsAlertSent, "shipmentDispatched:", shipmentDispatched, "pharmacyPrepared:", pharmacyPrepared);
     console.log("---------------------");
 
-}); 
+
+    // --- Modal Close Logic --- (Ensure this is INSIDE the DOMContentLoaded listener)
+    if (modalCloseButton) {
+        modalCloseButton.addEventListener('click', function() {
+            if (planModal) {
+                planModal.style.display = 'none';
+                console.log("Modal closed via button."); // Add log
+            }
+        });
+    } else {
+        console.error("Modal close button not found!");
+    }
+
+    // Close modal if user clicks outside the modal content
+    window.addEventListener('click', function(event) {
+        if (planModal && event.target == planModal) { // Check if the click was directly on the modal backdrop
+            planModal.style.display = 'none';
+            console.log("Modal closed via backdrop click."); // Add log
+        }
+    });
+
+}); // <-- End of DOMContentLoaded listener 
