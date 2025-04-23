@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- Element References ---
     // Dr. Ayesha
     const ayeshaAlertText = document.querySelector('#view-ayesha .heatmap-placeholder p strong');
-    const ayeshaHeatmapArea = document.querySelector('#view-ayesha .heatmap-placeholder .map-area');
+    const ayeshaHeatmapArea = document.querySelector('#view-ayesha .heatmap-placeholder .map-area'); // Restore old reference
     const ayeshaTrendChartArea = document.querySelector('#view-ayesha .trend-chart-placeholder .chart-area');
     const ayeshaTrendDataSources = document.querySelector('#view-ayesha .trend-chart-placeholder small');
     const heatmapWhyBtn = document.getElementById('heatmapWhyBtn');
@@ -317,16 +317,43 @@ document.addEventListener('DOMContentLoaded', function() {
         // Dr. Ayesha
         if (ayeshaAlertText) {
             ayeshaAlertText.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ALERT: Flu Surge Detected in Deira (${overallConfirmationRate}% confirmation rate)`;
+            // Remove the loading spinner icon once data is processed
+            const loadingIcon = ayeshaAlertText.querySelector('.fa-spin');
+            if (loadingIcon) loadingIcon.remove();
         }
-        if (ayeshaHeatmapArea) {
-            // Inject simulated heatmap HTML
+
+        if (ayeshaHeatmapArea) { // Restore check and innerHTML injection
+            // Inject simulated map risk points HTML
+            // Note: top/left percentages are approximate locations on the map area
             ayeshaHeatmapArea.innerHTML = `
-                <div class="map-region region-jumeirah">Jumeirah (Low)</div>
-                <div class="map-region region-burdubai">Bur Dubai (Med)</div>
-                <div class="map-region region-deira">Deira (High)</div>
-                <div style="position:absolute; bottom: 5px; right: 5px; font-size:0.8em; background:rgba(255,255,255,0.7); padding: 2px;">Simulated Zones</div>
+                <div class="map-risk-point risk-low" style="top: 75%; left: 25%;" title="Al Barsha (Low)">L</div>
+                <div class="map-risk-point risk-low" style="top: 40%; left: 15%;" title="Jumeirah (Low)">L</div>
+                <div class="map-risk-point risk-medium" style="top: 50%; left: 40%;" title="Downtown (Medium)">M</div>
+                <div class="map-risk-point risk-medium" style="top: 55%; left: 50%;" title="Business Bay (Medium)">M</div>
+
+                <div class="map-risk-point risk-low" style="top: 60%; left: 10%;" title="Umm Suqeim (Low)">L</div>
+                <div class="map-risk-point risk-medium" style="top: 45%; left: 65%;" title="Bur Dubai (Medium)">M</div>
+                <div class="map-risk-point risk-critical" style="top: 30%; left: 75%;" title="Deira (Critical)">C</div>
+                <div class="map-risk-point risk-high" style="top: 40%; left: 80%;" title="Al Karama (High)">H</div>
+
+                <div class="map-risk-point risk-low" style="top: 85%; left: 35%;" title="Marina (Low)">L</div>
+                <div class="map-risk-point risk-low" style="top: 90%; left: 45%;" title="JLT (Low)">L</div>
+                <div class="map-risk-point risk-medium" style="top: 15%; left: 85%;" title="Al Nahda (Medium)">M</div>
+                <div class="map-risk-point risk-low" style="top: 20%; left: 95%;" title="Mirdif (Low)">L</div>
+
+                <!-- Optional: Add a simple legend -->
+                <div style="position: absolute; bottom: 5px; left: 5px; background: rgba(255,255,255,0.8); padding: 3px 5px; border-radius: 3px; font-size: 0.9em;">
+                    Risk: <span class="map-risk-point risk-low" style="position:static; display:inline-block; width:12px; height:12px; transform:none; margin: 0 2px;"></span> Low
+                    <span class="map-risk-point risk-medium" style="position:static; display:inline-block; width:12px; height:12px; transform:none; margin: 0 2px;"></span> Med
+                    <span class="map-risk-point risk-high" style="position:static; display:inline-block; width:12px; height:12px; transform:none; margin: 0 2px;"></span> High
+                    <span class="map-risk-point risk-critical" style="position:static; display:inline-block; width:12px; height:12px; transform:none; margin: 0 2px;"></span> Crit
+                </div>
             `;
+            // Remove the loading message if it was separate
+            const loadingMsg = ayeshaHeatmapArea.querySelector('.map-loading');
+            if (loadingMsg) loadingMsg.remove();
         }
+
         if (ayeshaTrendChartArea) {
             ayeshaTrendChartArea.innerHTML = `<strong>Daily Visits (Symptom Reports):</strong><br><div style="height: 60px; border: 1px solid #ccc; padding: 5px; overflow-x: auto; white-space: nowrap;">${trendSummary || 'No visit data.'}</div>`;
         }
@@ -338,7 +365,6 @@ document.addEventListener('DOMContentLoaded', function() {
         // e.g., Update Leila's local forecast based on Deira Urgent Care counts
         // Note: This part was removed in the revert, as the button clicks will now handle populating other views.
     }
-
 
     // --- View Switching Logic (Updated) ---
     function switchView(selectedRole) {
@@ -1045,16 +1071,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- Initial Setup ---
     console.log("--- Initial Setup ---");
-    processDataForDashboard(); // Update Ayesha's view
-    updateSummaryViews(); // <-- SET INITIAL SUMMARY VIEW CONTENT
-    switchView(roleSelect.value); // Set initial view based on dropdown
-
-    // Initial button states - disable buttons based on workflow state vars
-    updateButtonStates(); // Use the helper function
+    processDataForDashboard(); // Update Ayesha's view (this will now call the restored code)
+    updateSummaryViews();
+    switchView(roleSelect.value);
+    updateButtonStates();
 
     console.log("Initial button states set.");
     console.log("---------------------");
-
 
     // --- Modal Close Logic --- (Ensure this is INSIDE the DOMContentLoaded listener)
     if (modalCloseButton) {
