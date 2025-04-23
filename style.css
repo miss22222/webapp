@@ -79,11 +79,30 @@ main {
     display: block; /* Show active view */
 }
 
-.dashboard-view h2 {
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start; /* Align items to the top */
     margin-bottom: 1.5rem;
-    color: #0a2e5c;
     border-bottom: 2px solid #e0e0e0;
     padding-bottom: 0.5rem;
+}
+
+.dashboard-view h2 {
+    margin-bottom: 0; /* Remove bottom margin as it's handled by header */
+    flex-grow: 1; /* Allow title to take available space */
+    padding-right: 1rem; /* Add space between title and image */
+    color: #0a2e5c;
+}
+
+.persona-image {
+    height: 80px; /* Adjust size as needed */
+    width: 80px;  /* Adjust size as needed */
+    border-radius: 50%; /* Make it circular */
+    object-fit: cover; /* Ensure image covers the area well */
+    border: 3px solid #0a2e5c; /* Optional border */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    flex-shrink: 0; /* Prevent image from shrinking */
 }
 
 /* Grid Layout for Dashboards */
@@ -91,6 +110,15 @@ main {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
     gap: 1.5rem;
+}
+
+/* Add specific grid setup for loop view if needed */
+#view-loop .grid-container {
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); /* Example: Allow slightly wider cards */
+}
+
+#view-impact .grid-container {
+     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Example: Three columns */
 }
 
 .grid-container.single-column {
@@ -127,16 +155,30 @@ main {
 .simulation-card { border-left-color: #9b59b6; } /* Purple for analysis */
 .model-tuning-card { border-left-color: #3498db; }
 
+/* Specific Card Types (Add new ones) */
+.loop-diagram-card { border-left-color: #6f42c1; } /* Purple for system view */
+.kpi-card { border-left-color: #17a2b8; } /* Teal for KPIs */
+.impact-card { border-left-color: #28a745; } /* Green for impact */
+.cost-savings { border-left-color: #ffc107; } /* Yellow for cost */
+.lives-impacted { border-left-color: #dc3545; } /* Red for lives */
+.sustainability { border-left-color: #28a745; } /* Green for sustainability */
+
 
 /* Placeholders for Complex Elements */
-.heatmap-placeholder, .trend-chart-placeholder, .forecast-chart-placeholder, .route-placeholder, .timeline-placeholder {
+.heatmap-placeholder, .trend-chart-placeholder, .forecast-chart-placeholder, .route-placeholder, .timeline-placeholder,
+.loop-diagram-placeholder, .impact-chart-placeholder {
     background-color: #e9ecef;
     border: 1px dashed #ced4da;
-    padding: 1rem;
+    padding: 1.5rem; /* Increased padding slightly */
     margin-bottom: 1rem;
     border-radius: 4px;
     text-align: center;
     color: #6c757d;
+    min-height: 180px; /* Slightly taller for maps */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .map-area, .chart-area {
@@ -148,6 +190,84 @@ main {
     border: 1px solid #dee2e6;
     margin-top: 0.5rem;
     font-style: italic;
+}
+
+/* Loop Diagram Specific Styles */
+.loop-diagram-placeholder .loop-text {
+    margin-top: 1rem;
+    font-weight: bold;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+}
+.loop-step {
+    padding: 5px 10px;
+    border-radius: 15px;
+    color: white;
+    font-size: 0.9em;
+}
+.loop-step.perceive { background-color: #5bc0de; } /* Light blue */
+.loop-step.reason { background-color: #9b59b6; } /* Purple */
+.loop-step.act { background-color: #f0ad4e; } /* Orange */
+.loop-step.learn { background-color: #5cb85c; } /* Green */
+.loop-diagram-placeholder .fa-arrow-right { margin: 0 5px; }
+
+/* KPI List Styles */
+.kpi-list {
+    list-style: none;
+    padding: 0;
+}
+.kpi-item {
+    display: flex;
+    align-items: center;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 5px;
+    border-left: 5px solid; /* Accent color */
+}
+.kpi-item i {
+    font-size: 1.8rem;
+    margin-right: 1.5rem;
+    width: 40px; /* Fixed width for alignment */
+    text-align: center;
+}
+.kpi-item div {
+    flex-grow: 1;
+}
+.kpi-item strong {
+    display: block;
+    font-size: 1rem;
+    color: #495057;
+}
+.kpi-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #0a2e5c;
+}
+/* KPI Accent Colors */
+.kpi-item.shortages { border-left-color: #d9534f; } /* Red */
+.kpi-item.shortages i { color: #d9534f; }
+.kpi-item.response-time { border-left-color: #4a90e2; } /* Blue */
+.kpi-item.response-time i { color: #4a90e2; }
+.kpi-item.wastage { border-left-color: #5cb85c; } /* Green */
+.kpi-item.wastage i { color: #5cb85c; }
+.kpi-item.collaboration { border-left-color: #f0ad4e; } /* Orange */
+.kpi-item.collaboration i { color: #f0ad4e; }
+
+
+/* Impact Card Specific Styles */
+.impact-card h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.impact-card p {
+    margin-top: 1rem;
+    font-size: 0.95rem;
 }
 
 /* Buttons */
@@ -165,14 +285,20 @@ main {
     margin: 0.2rem;
 }
 
-.button-accept { background-color: #5cb85c; color: white; }
-.button-accept:hover { background-color: #4cae4c; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.button-accept { background-color: #28a745; border-color: #28a745; }
+.button-accept:hover { background-color: #218838; border-color: #1e7e34; }
+.button-modify { background-color: #ffc107; border-color: #ffc107; color: #212529; }
+.button-modify:hover { background-color: #e0a800; border-color: #d39e00; }
+.button-decline { background-color: #dc3545; border-color: #dc3545; }
+.button-decline:hover { background-color: #c82333; border-color: #bd2130; }
+.button-warning { background-color: #fd7e14; border-color: #fd7e14; }
+.button-warning:hover { background-color: #e66a00; border-color: #d96400; }
+.button-info { background-color: #17a2b8; border-color: #17a2b8; }
+.button-info:hover { background-color: #138496; border-color: #117a8b; }
 
-.button-modify { background-color: #f0ad4e; color: white; }
-.button-modify:hover { background-color: #ec971f; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-
-.button-decline { background-color: #d9534f; color: white; }
-.button-decline:hover { background-color: #c9302c; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.button-toggle { /* Style for toggle buttons */
+    /* ... existing toggle styles ... */
+}
 
 .info-button {
     background-color: #5bc0de;
@@ -328,4 +454,173 @@ footer p {
     .action-buttons {
         flex-direction: column;
     }
-} 
+}
+
+/* Simulated Map Styles */
+.map-area, .route-placeholder, .chart-area {
+    position: relative; /* Needed for absolute positioning of elements inside */
+    overflow: hidden; /* Hide parts of SVG that might overflow */
+}
+
+.simulated-heatmap, .simulated-route-map, .simulated-national-map {
+    background-color: #d0e0f0; /* Light blue background like a map */
+    border: 1px solid #a0b0c0;
+    min-height: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative; /* For positioning elements within */
+    font-size: 0.8em; /* Smaller text for map elements */
+}
+
+.map-loading {
+    color: #6c757d;
+    font-style: italic;
+}
+
+/* Ayesha's Heatmap */
+.simulated-heatmap .map-region {
+    position: absolute;
+    border: 1px solid rgba(0,0,0,0.2);
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 2px;
+    font-weight: bold;
+    color: rgba(0,0,0,0.7);
+}
+.simulated-heatmap .region-deira {
+    top: 30%; left: 40%; width: 30%; height: 40%;
+    background-color: rgba(255, 0, 0, 0.6); /* Red for high alert */
+    border-color: darkred;
+    color: white;
+    z-index: 2; /* Ensure it's on top */
+}
+.simulated-heatmap .region-burdubai {
+    top: 60%; left: 15%; width: 25%; height: 30%;
+    background-color: rgba(255, 165, 0, 0.4); /* Orange for medium */
+}
+.simulated-heatmap .region-jumeirah {
+    top: 20%; left: 10%; width: 20%; height: 30%;
+    background-color: rgba(0, 128, 0, 0.3); /* Green for low */
+}
+
+/* Imran's Route Map */
+.simulated-route-map svg {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0; left: 0;
+}
+.simulated-route-map .map-point {
+    position: absolute;
+    background-color: #0a2e5c; /* Dark blue */
+    color: white;
+    padding: 3px 6px;
+    border-radius: 50%;
+    font-size: 0.9em;
+    z-index: 1;
+    box-shadow: 0 0 3px rgba(0,0,0,0.5);
+}
+.simulated-route-map .point-hub { top: 15%; left: 15%; }
+.simulated-route-map .point-pharmacy1 { top: 40%; left: 60%; }
+.simulated-route-map .point-pharmacy2 { top: 70%; left: 40%; }
+
+/* Faisal's National Map */
+.simulated-national-map .map-zone {
+     position: absolute;
+     border: 1px solid rgba(0,0,0,0.2);
+     border-radius: 4px;
+     display: flex;
+     justify-content: center;
+     align-items: center;
+     text-align: center;
+     padding: 2px;
+     font-weight: bold;
+     color: rgba(0,0,0,0.7);
+     background-color: rgba(0, 128, 0, 0.3); /* Default green */
+}
+.simulated-national-map .zone-north { top: 10%; left: 30%; width: 40%; height: 25%; }
+.simulated-national-map .zone-central { top: 40%; left: 20%; width: 60%; height: 30%; }
+.simulated-national-map .zone-south { top: 75%; left: 40%; width: 30%; height: 20%; }
+.simulated-national-map .zone-alert {
+    background-color: rgba(255, 0, 0, 0.6); /* Red for alert */
+    border-color: darkred;
+    color: white;
+    z-index: 2;
+}
+
+/* Modal Styles */
+.modal {
+   display: none; /* Hidden by default */
+   position: fixed; /* Stay in place */
+   z-index: 1000; /* Sit on top */
+   left: 0;
+   top: 0;
+   width: 100%; /* Full width */
+   height: 100%; /* Full height */
+   overflow: auto; /* Enable scroll if needed */
+   background-color: rgba(0,0,0,0.5); /* Black w/ opacity (backdrop) */
+   animation: fadeIn 0.3s ease-in-out; /* Simple fade-in */
+}
+
+.modal-content {
+   background-color: #fefefe;
+   margin: 10% auto; /* 10% from the top and centered */
+   padding: 25px;
+   border: 1px solid #888;
+   width: 80%; /* Could be more or less, depending on screen size */
+   max-width: 700px; /* Maximum width */
+   border-radius: 8px;
+   position: relative;
+   box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+   animation: slideIn 0.3s ease-in-out; /* Simple slide-in */
+}
+
+.modal-close-button {
+   color: #aaa;
+   position: absolute;
+   top: 10px;
+   right: 20px;
+   font-size: 28px;
+   font-weight: bold;
+   cursor: pointer;
+}
+
+.modal-close-button:hover,
+.modal-close-button:focus {
+   color: black;
+   text-decoration: none;
+}
+
+.modal h3 {
+   margin-top: 0;
+   color: #0a2e5c;
+   border-bottom: 1px solid #eee;
+   padding-bottom: 10px;
+}
+
+.modal-body {
+   margin-top: 15px;
+   line-height: 1.7;
+}
+
+.modal-body strong {
+    color: #1a4a8a;
+}
+
+/* Simple Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideIn {
+    from { transform: translateY(-30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* Responsive Adjustments */
+/* ... existing responsive styles ... */ 
