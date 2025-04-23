@@ -20,6 +20,8 @@
                     <option value="leila">Leila (Pharmacist)</option>
                     <option value="faisal">Faisal (Supplier)</option>
                     <option value="reem">Reem (AI Analyst)</option>
+                    <option value="loop">System Loop & KPIs</option>
+                    <option value="impact">Overall Impact</option>
                 </select>
             </div>
         </div>
@@ -29,14 +31,19 @@
 
         <!-- Dr. Ayesha's View (Public Health Director) -->
         <section id="view-ayesha" class="dashboard-view active-view">
-            <h2>Dr. Ayesha's Dashboard (Public Health Director)</h2>
+            <div class="dashboard-header">
+                <h2>Dr. Ayesha's Dashboard (Public Health Director)</h2>
+                <img src="ayesha.png" alt="Dr. Ayesha" class="persona-image">
+            </div>
             <div class="grid-container">
                 <!-- Heatmap & Outbreak Spike -->
                 <div class="card heatmap-card">
                     <h3>Live Outbreak Risk Map & Trends</h3>
                     <div class="heatmap-placeholder">
                         <p><strong><i class="fas fa-sync fa-spin"></i> Loading Alert Status...</strong></p>
-                        <div class="map-area">[Loading Heatmap Data...]</div>
+                        <div class="map-area simulated-heatmap" id="ayeshaHeatmapArea">
+                            <div class="map-loading">[Loading Heatmap Data...]</div>
+                        </div>
                         <span class="badge challenge-response">Challenge Response Active</span>
                         <button id="heatmapWhyBtn" class="button info-button">Why?</button>
                     </div>
@@ -73,6 +80,7 @@
                         <p><em>Impact Estimate:</em> Reduce potential hospital overload by 15-20%.</p>
                         <p><em>Confidence:</em> <span style="color: green; font-weight: bold;">High (90%)</span></p>
                         <div class="action-buttons">
+                            <button id="viewPlanBtn" class="button button-info"><i class="fas fa-eye"></i> View Plan</button>
                             <button id="approvePlanBtn" class="button button-accept"><i class="fas fa-check"></i> Approve Plan</button>
                             <button id="modifyPlanBtn" class="button button-modify"><i class="fas fa-edit"></i> Modify</button>
                             <button id="declinePlanBtn" class="button button-decline"><i class="fas fa-times"></i> Decline</button>
@@ -125,7 +133,10 @@
 
         <!-- Imran's View (Logistics Manager) -->
         <section id="view-imran" class="dashboard-view">
-            <h2>Imran's Dashboard (Regional Logistics Manager)</h2>
+            <div class="dashboard-header">
+                <h2>Imran's Dashboard (Regional Logistics Manager)</h2>
+                <img src="imran.png" alt="Imran" class="persona-image">
+            </div>
              <div class="grid-container">
                  <div class="card stock-card">
                      <h3>Inventory & Forecast (Flu Meds - Deira Hub)</h3>
@@ -152,15 +163,12 @@
 
                  <div class="card route-card">
                      <h3>AI Recommended Redistribution</h3>
-                     <p id="imranActionMessage"><strong><i class="fas fa-random"></i> Action:</strong> Awaiting approved plan for redistribution details.</p>
-                     <div id="imranRouteDetails" class="route-placeholder" style="display: none;">
-                         <p>Optimized Route:</p>
-                         <div class="map-area">[Map showing optimized truck route from Al Ain Depot to Deira Hub, avoiding traffic hotspots]</div>
-                         <p><strong>ETA:</strong> 4 hours</p>
-                         <p><strong>Proposed Stock:</strong> 4,000 Flu Vaccines, 2,500 Antivirals</p>
+                     <p id="imranActionMessage">Awaiting plan approval to calculate optimal routes.</p>
+                     <div class="route-placeholder simulated-route-map" id="imranRouteDetails">
+                         <div class="map-loading">[Route Map Placeholder...]</div>
                      </div>
                      <div class="action-buttons">
-                         <button id="confirmDispatchBtn" class="button button-accept" disabled><i class="fas fa-check-circle"></i> Confirm Route & Dispatch</button>
+                         <button id="confirmDispatchBtn" class="button button-accept" disabled><i class="fas fa-check"></i> Confirm Route & Dispatch</button>
                          <button id="modifyDispatchBtn" class="button button-modify" disabled><i class="fas fa-pencil-alt"></i> Adjust Quantities/Route</button>
                      </div>
                  </div>
@@ -190,7 +198,10 @@
 
         <!-- Leila's View (Community Pharmacist) -->
         <section id="view-leila" class="dashboard-view">
-            <h2>Leila's Dashboard (Community Pharmacist - Deira)</h2>
+            <div class="dashboard-header">
+                <h2>Leila's Dashboard (Community Pharmacist)</h2>
+                <img src="leila.png" alt="Leila" class="persona-image">
+            </div>
             <div class="grid-container single-column">
                 <div class="card notification-card">
                     <h3>Notifications & Alerts</h3>
@@ -224,18 +235,20 @@
             </div>
         </section>
 
-        <!-- Faisal's View (Pharmaceutical Supplier) -->
+        <!-- Faisal's View (Supplier Manager) -->
         <section id="view-faisal" class="dashboard-view">
-            <h2>Faisal's Dashboard (Pharmaceutical Supplier)</h2>
+            <div class="dashboard-header">
+                <h2>Faisal's Dashboard (Supplier Manager)</h2>
+                <img src="faisal.png" alt="Faisal" class="persona-image">
+            </div>
              <div class="grid-container">
                  <div class="card national-demand-card">
-                     <h3>National Demand Forecast & Signals</h3>
-                     <p id="faisalDemandSignal"><strong><i class="fas fa-chart-line"></i> Signal:</strong> Monitoring national health network signals...</p>
-                      <div class="forecast-chart-placeholder">
-                        <p>National Demand Trend: Flu Vaccines & Antivirals</p>
-                        <div class="chart-area">[National Trend Chart - Currently Stable]</div>
-                        <small>Key Drivers: Awaiting significant outbreak triggers.</small>
-                    </div>
+                     <h3>National Demand Signal</h3>
+                     <p id="faisalDemandSignal"><strong><i class="fas fa-chart-line"></i> Signal:</strong> Stable - Monitoring national trends.</p>
+                     <div class="chart-area simulated-national-map" id="faisalDemandChartArea">
+                         <div class="map-loading">[National Trend Map - Currently Stable]</div>
+                     </div>
+                     <small>Key Drivers: Awaiting significant outbreak triggers.</small>
                  </div>
 
                  <div class="card production-card">
@@ -274,7 +287,10 @@
 
         <!-- Reem's View (AI & Data Analyst) -->
         <section id="view-reem" class="dashboard-view">
-            <h2>Reem's Dashboard (AI & Data Analyst)</h2>
+            <div class="dashboard-header">
+                <h2>Reem's Dashboard (AI & Data Analyst)</h2>
+                <img src="reem.png" alt="Reem" class="persona-image">
+            </div>
             <div class="grid-container">
                 <div class="card simulation-card">
                     <h3>Model Simulation & Tuning</h3>
@@ -323,6 +339,89 @@
             </div>
         </section>
 
+        <!-- NEW: System Loop & KPIs View -->
+        <section id="view-loop" class="dashboard-view">
+            <h2>System Loop & Key Performance Indicators</h2>
+            <p>Diviner orchestrates a continuous cycle of perception, reasoning, action, and learning across all stakeholders, breaking down silos and accelerating response.</p>
+            <div class="grid-container">
+                <div class="card loop-diagram-card">
+                    <h3>The Diviner Agentic Loop</h3>
+                    <div class="loop-diagram-placeholder">
+                        <p>[Animated Diagram Placeholder]</p>
+                        <div class="loop-text">
+                            <span class="loop-step perceive"><i class="fas fa-eye"></i> Perceive (Data Ingestion)</span> &rarr;
+                            <span class="loop-step reason"><i class="fas fa-brain"></i> Reason (AI Analysis & Recs)</span> &rarr;
+                            <span class="loop-step act"><i class="fas fa-play"></i> Act (Stakeholder Actions)</span> &rarr;
+                            <span class="loop-step learn"><i class="fas fa-sync-alt"></i> Learn (Model Retraining)</span> &rarr; (Loop)
+                        </div>
+                         <p style="margin-top: 1rem; font-style: italic;">This cycle involves Dr. Ayesha, Imran, Leila, Faisal, and Reem, each guided by AI insights relevant to their role.</p>
+                    </div>
+                </div>
+                <div class="card kpi-card">
+                    <h3>Performance Impact (vs. Baseline)</h3>
+                    <ul class="kpi-list">
+                        <li class="kpi-item shortages">
+                            <i class="fas fa-ban"></i>
+                            <div>
+                                <strong>Shortages Prevented:</strong>
+                                <span class="kpi-value" id="kpiShortages">--%</span>
+                            </div>
+                        </li>
+                        <li class="kpi-item response-time">
+                            <i class="fas fa-shipping-fast"></i>
+                            <div>
+                                <strong>Response Time Improvement:</strong>
+                                <span class="kpi-value" id="kpiResponseTime">--x</span>
+                            </div>
+                        </li>
+                        <li class="kpi-item wastage">
+                            <i class="fas fa-recycle"></i>
+                            <div>
+                                <strong>Stock Wastage Reduction:</strong>
+                                <span class="kpi-value" id="kpiWastage">--%</span>
+                            </div>
+                        </li>
+                         <li class="kpi-item collaboration">
+                            <i class="fas fa-users"></i>
+                            <div>
+                                <strong>Cross-Functional Efficiency:</strong>
+                                <span class="kpi-value" id="kpiEfficiency">--</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- NEW: Overall Impact View -->
+        <section id="view-impact" class="dashboard-view">
+            <h2>Overall Impact Assessment</h2>
+            <p>By optimizing the healthcare logistics chain, Diviner contributes to significant positive outcomes.</p>
+             <div class="grid-container">
+                 <div class="card impact-card cost-savings">
+                     <h3><i class="fas fa-dollar-sign"></i> Healthcare Cost Savings</h3>
+                     <div class="impact-chart-placeholder" id="impactChartCost">
+                         [Calculating...]
+                     </div>
+                     <p>Estimated annual savings: <strong>Significant</strong> (Quantification pending full-scale deployment)</p>
+                 </div>
+                  <div class="card impact-card lives-impacted">
+                     <h3><i class="fas fa-heartbeat"></i> Lives Positively Impacted</h3>
+                      <div class="impact-chart-placeholder" id="impactChartLives">
+                         [Calculating...]
+                     </div>
+                     <p>Focus on timely access to critical medications during surges, improving community health resilience.</p>
+                 </div>
+                  <div class="card impact-card sustainability">
+                     <h3><i class="fas fa-leaf"></i> Sustainability Gains</h3>
+                      <div class="impact-chart-placeholder" id="impactChartSustainability">
+                         [Calculating...]
+                     </div>
+                     <p>Optimized logistics and reduced spoilage contribute to a greener supply chain.</p>
+                 </div>
+             </div>
+        </section>
+
         <!-- Future Features Placeholder -->
         <section class="future-features">
             <h4><i class="fas fa-forward"></i> Coming Soon...</h4>
@@ -337,6 +436,18 @@
             <p>Built with Agentic AI | <i class="fas fa-eye"></i> Perceive → <i class="fas fa-brain"></i> Reason → <i class="fas fa-play"></i> Act → <i class="fas fa-sync-alt"></i> Learn</p>
         </div>
     </footer>
+
+    <!-- Modal Structure for Viewing Plan -->
+    <div id="planModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close-button">&times;</span>
+            <h3 id="modalTitle">Health Action Plan Details</h3>
+            <div id="modalBody">
+                <!-- Plan details will be loaded here by JavaScript -->
+                <p>Loading plan details...</p>
+            </div>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>
